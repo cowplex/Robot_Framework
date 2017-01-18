@@ -78,7 +78,7 @@ public class Autonomous
 			
 			// Get the target position and actual current position
 			
-			double[] output = new double[2];
+			double[] output = new double[3];
 			
 			_drive.drive_inputs(output);
 			

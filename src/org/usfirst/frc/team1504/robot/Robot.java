@@ -6,11 +6,11 @@ package org.usfirst.frc.team1504.robot;
 //import edu.wpi.first.wpilibj.DriverStation;
 //import java.util.Base64;
 
-import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -23,7 +23,6 @@ public class Robot extends RobotBase {
 	private Update_Semaphore _semaphore = Update_Semaphore.getInstance();
 	private Logger _logger = Logger.getInstance();
 	private Autonomous _autonomous = Autonomous.getInstance();
-	private Vision _vision = Vision.getInstance();
 	Pneumatics t3 = Pneumatics.getInstance();
 	Drive t5 = Drive.getInstance();
 	private Thread _dashboard_task;
@@ -48,11 +47,20 @@ public class Robot extends RobotBase {
     	_dashboard_task = new Thread(new Runnable() {
 			public void run() {
 				PowerDistributionPanel pdp = new PowerDistributionPanel();
+				char edge_track = 0;
 				while(true)
 				{	
 					SmartDashboard.putNumber("Robot Current", pdp.getTotalCurrent());
 					SmartDashboard.putNumber("Robot Voltage", m_ds.getBatteryVoltage());
 					SmartDashboard.putNumber("Robot Time", m_ds.getMatchTime());
+					
+					// Get image from groundtruth sensor on rising edge of roboRIO User button
+					edge_track = (char)( ( (edge_track << 1) + (HALUtil.getFPGAButton() ? 1 : 0) ) & 3);
+					if(edge_track == 1)
+					{
+						// Get image from groundtruth sensors, output it to the DS
+					}
+					
 					Timer.delay(.05);
 				}
 			}

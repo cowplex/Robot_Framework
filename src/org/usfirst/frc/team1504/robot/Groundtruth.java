@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.usfirst.frc.team1504.robot.Update_Semaphore.Updatable;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class Groundtruth implements Updatable {
 	private static final Groundtruth instance = new Groundtruth();
 	
@@ -171,7 +173,8 @@ public class Groundtruth implements Updatable {
 			return;
 		
 		byte[] data = new byte[_raw_data.size()];
-		for(int index = 0; index < _raw_data.size(); index++)
+		int index;
+		for(index = 0; index < _raw_data.size(); index++)
 			data[index] = _raw_data.get(index);
 		
 		_raw_data.clear();
@@ -183,5 +186,19 @@ public class Groundtruth implements Updatable {
 		/*if(_raw_data != null)
 			_logger.log(Map.LOGGED_CLASSES.GROUNDTRUTH, _raw_data);
 		_raw_data = null;*/
+		
+		// SmartDashboard output code
+		SmartDashboard.putNumber("Groundtruth position X", _position[0]);
+		SmartDashboard.putNumber("Groundtruth position Y", _position[1]);
+		SmartDashboard.putNumber("Groundtruth position W", _position[2]);
+		SmartDashboard.putNumber("Groundtruth speed X", _speed[0]);
+		SmartDashboard.putNumber("Groundtruth speed Y", _speed[1]);
+		SmartDashboard.putNumber("Groundtruth speed W", _speed[2]);
+		SmartDashboard.putNumber("Groundtruth acceleration X", _acceleration[0]);
+		SmartDashboard.putNumber("Groundtruth acceleration Y", _acceleration[1]);
+		SmartDashboard.putNumber("Groundtruth acceleration W", _acceleration[2]);
+		SmartDashboard.putNumber("Groundtruth raw X", data[--index]);
+		SmartDashboard.putNumber("Groundtruth raw Y", data[--index]);
+		SmartDashboard.putNumber("Groundtruth raw W", data[--index]);
 	}
 }

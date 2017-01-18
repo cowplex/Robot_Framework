@@ -246,7 +246,8 @@ public class Drive implements Updatable {
 	private void update_dashboard(byte[] currents)
 	{
 		SmartDashboard.putNumber("Drive input forward", _input[0]);
-		SmartDashboard.putNumber("Drive input anticlockwise", _input[1]);
+		SmartDashboard.putNumber("Drive input right", _input[1]);
+		SmartDashboard.putNumber("Drive input anticlockwise", _input[2]);
 		
 		SmartDashboard.putNumber("Drive FL current", currents[0]);
 		SmartDashboard.putNumber("Drive BL current", currents[1]);
