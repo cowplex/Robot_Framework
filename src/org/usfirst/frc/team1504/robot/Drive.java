@@ -152,6 +152,9 @@ public class Drive implements Updatable {
 	 */
 	private double[] groundtruth_correction(double[] input)
 	{
+		if(!_groundtruth.getDataGood())
+			return input;
+		
 		double[] normal_input = input;
 		double[] output = input;
 		double[] speeds = _groundtruth.getSpeed();
@@ -304,17 +307,14 @@ public class Drive implements Updatable {
 				{
 					// Don't do the fancy driver convenience stuff when we're PID controlling
 					
-					/*try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}*/
 					_new_data = false;
 					dump = true;
 				}
-				
+								
 				// Ground speed offset
+				_groundtruth.getData();
 				input = groundtruth_correction(input);
+				
 				// Output to motors - as fast as this loop will go
 				motorOutput(outputCompute(input));
 				
