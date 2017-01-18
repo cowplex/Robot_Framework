@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.usfirst.frc.team1504.robot.Update_Semaphore.Updatable;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Groundtruth implements Updatable {
@@ -12,8 +13,10 @@ public class Groundtruth implements Updatable {
 	
 	private Logger _logger = Logger.getInstance();
 	private Arduino _arduino = Arduino.getInstance();
+	private DriverStation _driver_station = DriverStation.getInstance();
 	//private volatile byte[] _raw_data = null;
 	private volatile List<Byte> _raw_data = new ArrayList<Byte>();
+	private volatile byte[] _current_data = new byte[6];
 	private double[] _position = {0.0, 0.0, 0.0};
 	private double[] _position_error = {0.0, 0.0, 0.0};
 	
@@ -97,9 +100,20 @@ public class Groundtruth implements Updatable {
 	 * Input the current data from the ground truth sensors
 	 * @param data - Data format: LEFT_X, LEFT_Y, LEFT_SQUAL, RIGHT_X, RIGHT_Y, RIGHT_SQUAL
 	 */
-	public void getData(/*byte[] data*/)
+	public void getData()
 	{
 		byte[] data = _arduino.getSensorData();
+		_current_data = data;
+		
+		if(_driver_station.isEnabled())
+			compute(data);
+		
+	}
+	
+	//public void getData(/*byte[] data*/)
+	private void compute(byte[] data)
+	{
+		//byte[] data = _arduino.getSensorData();
 		
 		// Data format: LEFT_X LEFT_Y LEFT_SQUAL RIGHT_X RIGHT_Y RIGHT_SQUAL
 		//_raw_data = data;
@@ -180,8 +194,7 @@ public class Groundtruth implements Updatable {
 			return;
 		
 		byte[] data = new byte[_raw_data.size()];
-		int index;
-		for(index = 0; index < _raw_data.size(); index++)
+		for(int index = 0; index < _raw_data.size(); index++)
 			data[index] = _raw_data.get(index);
 		
 		_raw_data.clear();
@@ -193,19 +206,29 @@ public class Groundtruth implements Updatable {
 		/*if(_raw_data != null)
 			_logger.log(Map.LOGGED_CLASSES.GROUNDTRUTH, _raw_data);
 		_raw_data = null;*/
-		
+	}
+	
+	public void dashboard_update()
+	{
 		// SmartDashboard output code
 		SmartDashboard.putNumber("Groundtruth position X", _position[0]);
 		SmartDashboard.putNumber("Groundtruth position Y", _position[1]);
 		SmartDashboard.putNumber("Groundtruth position W", _position[2]);
+		
 		SmartDashboard.putNumber("Groundtruth speed X", _speed[0]);
 		SmartDashboard.putNumber("Groundtruth speed Y", _speed[1]);
 		SmartDashboard.putNumber("Groundtruth speed W", _speed[2]);
+		
 		SmartDashboard.putNumber("Groundtruth acceleration X", _acceleration[0]);
 		SmartDashboard.putNumber("Groundtruth acceleration Y", _acceleration[1]);
 		SmartDashboard.putNumber("Groundtruth acceleration W", _acceleration[2]);
-		SmartDashboard.putNumber("Groundtruth raw X", data[--index]);
-		SmartDashboard.putNumber("Groundtruth raw Y", data[--index]);
-		SmartDashboard.putNumber("Groundtruth raw W", data[--index]);
+		
+		SmartDashboard.putBoolean("Groundtruth data good", _data_good);
+		SmartDashboard.putNumber("Groundtruth raw left X", _current_data[0]);
+		SmartDashboard.putNumber("Groundtruth raw left Y", _current_data[1]);
+		SmartDashboard.putNumber("Groundtruth raw left SQUAL", _current_data[2]);
+		SmartDashboard.putNumber("Groundtruth raw right X", _current_data[3]);
+		SmartDashboard.putNumber("Groundtruth raw right Y", _current_data[4]);
+		SmartDashboard.putNumber("Groundtruth raw right SQUAL", _current_data[5]);
 	}
 }

@@ -25,6 +25,8 @@ public class Robot extends RobotBase {
 	private Autonomous _autonomous = Autonomous.getInstance();
 	Pneumatics t3 = Pneumatics.getInstance();
 	Drive t5 = Drive.getInstance();
+	private Arduino _arduino = Arduino.getInstance();
+	private Groundtruth _groundtruth = Groundtruth.getInstance();
 	private Thread _dashboard_task;
 	
     /**
@@ -56,10 +58,10 @@ public class Robot extends RobotBase {
 					
 					// Get image from groundtruth sensor on rising edge of roboRIO User button
 					edge_track = (char)( ( (edge_track << 1) + (HALUtil.getFPGAButton() ? 1 : 0) ) & 3);
-					if(edge_track == 1)
-					{
-						// Get image from groundtruth sensors, output it to the DS
-					}
+					if(edge_track == 1) // Get image from groundtruth sensors, output it to the DS
+						SmartDashboard.putString("Groundtruth raw image", new String(_arduino.getSensorImage()));
+
+					_groundtruth.dashboard_update();
 					
 					Timer.delay(.05);
 				}
