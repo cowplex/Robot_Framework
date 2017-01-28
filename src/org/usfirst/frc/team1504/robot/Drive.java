@@ -328,7 +328,7 @@ public class Drive implements Updatable {
 					{
 						_dump_thread = new Thread(new Runnable() {
 							public void run() {
-								dump();
+								//dump();
 							}
 						});
 						_dump_thread.start();

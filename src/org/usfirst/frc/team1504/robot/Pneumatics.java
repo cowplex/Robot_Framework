@@ -31,7 +31,6 @@ public class Pneumatics implements Updatable
 	private Logger _logger = Logger.getInstance();
 	
 	private Compressor _compressor;
-	private AnalogInput _highside_pressure_input, _lowside_pressure_input;
 	private Pneumatics_state _state;
 	
 	private Thread _dashboard_task;
@@ -39,8 +38,6 @@ public class Pneumatics implements Updatable
 	protected Pneumatics()
 	{
 		_compressor = new Compressor();
-		_highside_pressure_input = new AnalogInput(Map.PNEUMATICS_HIGHSIDE_PORT);
-		_lowside_pressure_input =  new AnalogInput(Map.PNEUMATICS_LOWSIDE_PORT);
 		
 		_state = new Pneumatics_state();
 		
@@ -73,8 +70,6 @@ public class Pneumatics implements Updatable
 	
 	public void update()
 	{
-		_state._highside_pressure = voltage_to_pressure(_highside_pressure_input.getValue());
-		_state._lowside_pressure = voltage_to_pressure(_lowside_pressure_input.getValue());
 		_state._compressor_current = (float) _compressor.getCompressorCurrent();
 		_state._pressure_switch = _compressor.getPressureSwitchValue();
 		_state._compressor_enabled = _compressor.enabled();
@@ -82,8 +77,6 @@ public class Pneumatics implements Updatable
 	
 	private void update_dashboard()
 	{
-		SmartDashboard.putNumber("Pneumatics highside pressure", _state._highside_pressure);
-		SmartDashboard.putNumber("Pneumatics lowside pressure", _state._lowside_pressure);
 		SmartDashboard.putNumber("Pneumatics compressor current", _state._compressor_current);
 		SmartDashboard.putBoolean("Pneumatics pressure switch", _state._pressure_switch);
 	}

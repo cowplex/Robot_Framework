@@ -6,13 +6,16 @@ public class Map {
  */
 	public static final double UTIL_JOYSTICK_DEADZONE = 0.05;
 	
-	public static final int UTIL_OVERRIDE_BUTTON = 11;
+	public static final int UTIL_DRIVE_OVERRIDE_BUTTON = 11;
+	public static final int UTIL_OPERATOR_OVERRIDE_BUTTON = 1;
 	
 /**
  * Inputs
  */
 	public static final int DRIVE_CARTESIAN_JOYSTICK = 0;
 	public static final int DRIVE_POLAR_JOYSTICK = 1;
+	
+	public static final int OPERATOR_JOYSTICK = 2;
 	
 	// Joystick inputs
 	
@@ -98,10 +101,14 @@ public class Map {
 	public static final int VISION_INTERFACE_IMAGE_CAPTURE_SETTLE_TIMEOUT = 1750;
 	
 /**
- * Pneumatics stuff
+ * Winch stuff
  */
-	public static final int PNEUMATICS_HIGHSIDE_PORT = 0;
-	public static final int PNEUMATICS_LOWSIDE_PORT = 1;
+	public static final int WINCH_TALON_PORT_NANCY = 20;
+	public static final int WINCH_TALON_PORT_MEAD = 21;
+	
+	public static final int WINCH_POWER_AXIS = 1;
+	
+	public static final double WINCH_DIRECTION = 1.0;
 	
 /**
  * Logger stuff

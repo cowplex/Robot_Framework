@@ -116,10 +116,9 @@ public class Groundtruth implements Updatable {
 		//byte[] data = _arduino.getSensorData();
 		
 		// Data format: LEFT_X LEFT_Y LEFT_SQUAL RIGHT_X RIGHT_Y RIGHT_SQUAL
-		//_raw_data = data;
-		_raw_data.set(0, (byte) (_raw_data.get(0) + 1));
-		for(byte b : data)
-			_raw_data.add(b);
+		//_raw_data.set(0, (byte) (_raw_data.get(0) + 1));
+		//for(byte b : data)
+		//	_raw_data.add(b);
 		
 		if(data[2] < Map.GROUNDTRUTH_QUALITY_MINIMUM || data[5] < Map.GROUNDTRUTH_QUALITY_MINIMUM)
 		{
@@ -190,7 +189,8 @@ public class Groundtruth implements Updatable {
 
 	public void semaphore_update()
 	{
-		if(_raw_data.get(0) == 0)
+		return;
+		/*if(_raw_data.get(0) == 0)
 			return;
 		
 		byte[] data = new byte[_raw_data.size()];

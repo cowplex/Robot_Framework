@@ -41,22 +41,41 @@ public class Arduino
 		return sensor_data;
 	}
 
-/**
- *Requests the images from the left and right sensors
- * @return the images, 648 bytes, representing the LEFT and RIGHT sensor images in order. The first 324 bytes are the LEFT sensor image, the next 324 bytes are the RIGHT sensor image.
- */
-	public byte[] getSensorImage()
-	{	
-		byte[] buffer = new byte[1];
-		byte[] img_data = new byte[648];
-		
-		buffer[0] = Map.GROUNDTRUTH_ADDRESS;
-		buffer[1] = 2;
-		
-		_read_status = _bus.transaction(buffer, buffer.length, img_data, img_data.length);
-		return img_data;
+	/**
+	 *Requests the images from the left and right sensors
+	 * @return the images, 648 bytes, representing the LEFT and RIGHT sensor images in order. 
+	 * The first 324 bytes are the LEFT sensor image, the next 324 bytes are the RIGHT sensor image.
+	 * The image is actually returned in 27 24-byte chunks, due to the 32-byte restriction on I2C transactions. 
+	 * First a 0 is written to READ OFFSET, then transactions with 1 through 27 are read from the 
+	 * sensor to build up the full 648-byte image array.
+	 */
+		public synchronized byte[] getSensorImage()
+		{
+			byte[] buffer = new byte[3];
+			byte[] incoming_img_data = new byte[24];
+			byte[] final_image = new byte[648];
+			
+			buffer[0] = Map.GROUNDTRUTH_ADDRESS;
+			buffer[1] = 2;
+			
+			for(int i = 0; i <= 27; i++)
+			{
+				buffer[2] = (byte) i;
+				if (i == 0)
+				{
+					_bus.writeBulk(buffer);
+				}
+				else
+				{
+				_bus.transaction(buffer, buffer.length, incoming_img_data, incoming_img_data.length);
+				for(int j = 0; j < incoming_img_data.length; j++)
+				final_image[((i - 1) * 24) + j] = incoming_img_data[j];
+				}
+			}
 
-	}
+			return final_image;
+
+		}
 
 /**
  * Sets the color of the main robot lights

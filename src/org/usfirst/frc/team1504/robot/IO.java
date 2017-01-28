@@ -5,7 +5,18 @@ public class IO
 	private static Latch_Joystick _drive_forward = new Latch_Joystick(Map.DRIVE_CARTESIAN_JOYSTICK);
 	private static Latch_Joystick _drive_rotation = new Latch_Joystick(Map.DRIVE_POLAR_JOYSTICK);
 	
+	private static Latch_Joystick _operator_joystick = new Latch_Joystick(Map.OPERATOR_JOYSTICK);
+	
 	public static final long ROBOT_START_TIME = System.currentTimeMillis();
+	
+	public static boolean drive_override()
+	{
+		return _drive_forward.getRawButtonLatch(Map.UTIL_DRIVE_OVERRIDE_BUTTON);
+	}
+	public static boolean operator_override()
+	{
+		return _operator_joystick.getRawButtonLatch(Map.UTIL_OPERATOR_OVERRIDE_BUTTON);
+	}
 	
 	/**
 	 * Drive stuff
@@ -29,4 +40,13 @@ public class IO
 		return (_drive_rotation.getRawButton(4) ? -1.0 : 0.0) + (_drive_rotation.getRawButton(5) ? 1.0 : 0.0);
 	}
 
+	
+/**
+ * Winch stuff
+ */
+	
+	public static double winch_input()
+	{
+		return Utils.deadzone(Math.abs(_operator_joystick.getRawAxis(Map.WINCH_POWER_AXIS))) * Map.WINCH_DIRECTION;
+	}
 }

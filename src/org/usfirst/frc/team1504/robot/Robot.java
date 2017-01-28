@@ -7,6 +7,7 @@ package org.usfirst.frc.team1504.robot;
 //import java.util.Base64;
 
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.hal.HAL;
@@ -23,11 +24,14 @@ public class Robot extends RobotBase {
 	private Update_Semaphore _semaphore = Update_Semaphore.getInstance();
 	private Logger _logger = Logger.getInstance();
 	private Autonomous _autonomous = Autonomous.getInstance();
-	Pneumatics t3 = Pneumatics.getInstance();
+	//Pneumatics t3 = Pneumatics.getInstance();
 	Drive t5 = Drive.getInstance();
 	private Arduino _arduino = Arduino.getInstance();
 	private Groundtruth _groundtruth = Groundtruth.getInstance();
 	private Thread _dashboard_task;
+	private CameraInterface ci = CameraInterface.getInstance();
+	private Winch w = Winch.getInstance();
+	
 	
     /**
      * Create a new Robot
@@ -52,10 +56,11 @@ public class Robot extends RobotBase {
 				char edge_track = 0;
 				while(true)
 				{	
-					SmartDashboard.putNumber("Robot Current", pdp.getTotalCurrent());
+					//SmartDashboard.putNumber("Robot Current", pdp.getTotalCurrent());
+					//SmartDashboard.putNumber("Robot PDP Temperature", pdp.getTemperature());
 					SmartDashboard.putNumber("Robot Voltage", m_ds.getBatteryVoltage());
 					SmartDashboard.putNumber("Robot Time", m_ds.getMatchTime());
-					
+										
 					// Get image from groundtruth sensor on rising edge of roboRIO User button
 					edge_track = (char)( ( (edge_track << 1) + (HALUtil.getFPGAButton() ? 1 : 0) ) & 3);
 					if(edge_track == 1) // Get image from groundtruth sensors, output it to the DS
@@ -70,7 +75,9 @@ public class Robot extends RobotBase {
     	_dashboard_task.start();
     	
     	//System.out.println(new String(Base64.getDecoder().decode(Map.ROBOT_BANNER)));
-        System.out.println("Quixote Initialized ( robotInit() ) @ " + IO.ROBOT_START_TIME);
+    	Preferences prefs = Preferences.getInstance();
+    	String name = prefs.getString("Robot Name", "UNNAMED ROBOT");
+        System.out.println(name + " Initialized ( robotInit() ) @ " + IO.ROBOT_START_TIME);
     }
 
     /**
@@ -110,7 +117,20 @@ public class Robot extends RobotBase {
      * Test code should go here.
      * Users should add test code to this method that should run while the robot is in test mode.
      */
-    public void test() {}
+    public void test()
+    {
+    	System.out.println("Test Mode!");
+    	CameraInterface ci = CameraInterface.getInstance();
+    	ci.set_mode(CameraInterface.CAMERA_MODE.MULTI);
+    	//ci.set_mode(CameraInterface.CAMERA_MODE.SINGLE);
+    	while (isTest() && isEnabled())
+    	{
+    		// Switch camera views every 5 seconds like a pro
+    		ci.set_active_camera(ci.get_active_camera() == CameraInterface.CAMERAS.GEARSIDE ? CameraInterface.CAMERAS.INTAKESIDE : CameraInterface.CAMERAS.GEARSIDE);
+            System.out.println("Switching active camera to " + ci.get_active_camera().toString());
+            Timer.delay(5);
+    	}
+    }
 
     /**
      * Start a competition.
@@ -141,8 +161,11 @@ public class Robot extends RobotBase {
                 
                 autonomous();
                 
+                // Zero groundtruth reading on start
+                _groundtruth.setPosition(new double[] {0.0, 0.0, 0.0});
+                
                 while (isAutonomous() && !isDisabled()) {
-                	m_ds.waitForData(150);
+                	m_ds.waitForData(0.150);
                 	_semaphore.newData();
                 }
                 
@@ -168,7 +191,7 @@ public class Robot extends RobotBase {
                 operatorControl();
                 
                 while (isOperatorControl() && !isDisabled()) {
-                	m_ds.waitForData(150); // Blocks until we get new datas or 150ms elapse
+                	m_ds.waitForData(0.150); // Blocks until we get new datas or 150ms elapse
                 	_semaphore.newData();
                     //Timer.delay(0.01);
                 }
