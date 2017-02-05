@@ -27,6 +27,11 @@ public class Winch implements Updatable
 		return _instance;
 	}
 	
+	public static void initialize()
+	{
+		getInstance();
+	}
+	
 	public void semaphore_update()
 	{
 		if(_driver_station.getMatchTime() > 30.0 && !IO.operator_override())

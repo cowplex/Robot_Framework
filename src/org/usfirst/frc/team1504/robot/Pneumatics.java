@@ -63,6 +63,11 @@ public class Pneumatics implements Updatable
 		return instance;
 	}
 	
+	public static void initialize()
+	{
+		getInstance();
+	}
+	
 	private char voltage_to_pressure(int voltage)
 	{
 		return (char) ((250 * voltage / 4096) - 25);

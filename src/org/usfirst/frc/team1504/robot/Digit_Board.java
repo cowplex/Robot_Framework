@@ -69,6 +69,11 @@ public class Digit_Board
 		return Digit_Board.instance;
 	}
 	
+	public static void initialize()
+	{
+		getInstance();
+	}
+	
 	//Updates the values used for the display.
 	public void update()
 	{

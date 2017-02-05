@@ -82,6 +82,11 @@ public class DigitBoard
 		return DigitBoard.instance;
 	}
 	
+	public static void initialize()
+	{
+		getInstance();
+	}
+	
 	
 	protected DigitBoard()
 	{

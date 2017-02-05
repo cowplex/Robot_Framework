@@ -25,6 +25,11 @@ public class Arduino
 		return Arduino.instance;
 	}
 	
+	public static void initialize()
+	{
+		getInstance();
+	}
+	
 
 /**
  * Requests for groundtruth data from the sensors.

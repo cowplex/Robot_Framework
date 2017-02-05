@@ -50,6 +50,11 @@ public class Drive implements Updatable {
         return Drive.instance;
     }
     
+    public static void initialize()
+	{
+		getInstance();
+	}
+    
 	protected Drive()
 	{
 		_task_thread = new Thread(new DriveTask(this), "1504_Drive");

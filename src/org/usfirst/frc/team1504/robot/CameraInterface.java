@@ -41,6 +41,11 @@ public class CameraInterface
 		return _instance;
 	}
 	
+	public static void initialize()
+	{
+		getInstance();
+	}
+	
 	public void set_active_camera(CAMERAS camera)
 	{
 		_active_camera = camera;

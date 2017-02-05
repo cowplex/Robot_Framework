@@ -32,6 +32,11 @@ public class Logger {
 		return instance;
 	}
 	
+	public static void initialize()
+	{
+		getInstance();
+	}
+	
 	/**
 	 * Start the logger
 	 * @param prefix - The filename prefix to log under (Format: Prefix-Time.log)
