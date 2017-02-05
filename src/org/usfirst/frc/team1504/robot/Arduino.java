@@ -11,6 +11,7 @@ public class Arduino
 	public enum FRONTSIDE_MODE {DEFAULT, REVERSE, OFF};
 	public enum GEAR_MODE {OFF, PULSE, INDIVIDUAL_INTENSITY};
 	public enum INTAKE_LIGHT_MODE {OFF, ON};
+	public enum PARTY_MODE {OFF, ON};
 	
 	private static Arduino instance = new Arduino();
 	
@@ -159,6 +160,20 @@ public class Arduino
 		byte[] data = new byte[2];
 		
 		data[0] = Map.INTAKE_LIGHTS_ADDRESS;
+		data[1] = (byte) mode.ordinal();
+		
+		_bus.writeBulk(data);
+	}
+	
+/**
+ * Party Mode! Sweeps the MAIN lights around the color wheel at the PULSE SPEED.
+ * @param mode either OFF or ON
+ */
+	public void setPartyMode(PARTY_MODE mode)
+	{
+		byte[] data = new byte[2];
+		
+		data[0] = Map.PARTY_MODE_ADDRESS;
 		data[1] = (byte) mode.ordinal();
 		
 		_bus.writeBulk(data);

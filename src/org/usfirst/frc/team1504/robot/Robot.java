@@ -121,7 +121,7 @@ public class Robot extends RobotBase {
     {
     	System.out.println("Test Mode!");
     	CameraInterface ci = CameraInterface.getInstance();
-    	ci.set_mode(CameraInterface.CAMERA_MODE.MULTI);
+    	//ci.set_mode(CameraInterface.CAMERA_MODE.MULTI);
     	//ci.set_mode(CameraInterface.CAMERA_MODE.SINGLE);
     	while (isTest() && isEnabled())
     	{

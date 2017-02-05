@@ -80,7 +80,8 @@ public class Drive implements Updatable {
 	private Logger _logger = Logger.getInstance();
 	private volatile boolean _new_data = false;
 	private volatile double[] _input = {0.0, 0.0, 0.0};
-	private volatile double _rotation_offset = 0.0;
+	private volatile double _rotation_offset = 180.0;
+	private volatile double[] _orbit_point = {0.0, 0.0}; //{0.0, 1.15};
 	private DriveGlide _glide = new DriveGlide();
 	private Groundtruth _groundtruth = Groundtruth.getInstance();
 	
@@ -111,7 +112,7 @@ public class Drive implements Updatable {
 		if(!_ds.isAutonomous())
 		{
 			if(IO.drive_wiggle() != 0.0)
-				drive_inputs(new double[] { 0.25 * (((_direction & 1) == 0) ? 1.0 : -1.0) , 0.31 * IO.drive_wiggle()});
+				drive_inputs(new double[] { 0.25 * (((_direction & 1) == 0) ? 1.0 : -1.0) , 0, 0.31 * IO.drive_wiggle()});
 			else
 				drive_inputs(IO.drive_input());
 		}
@@ -143,6 +144,70 @@ public class Drive implements Updatable {
 	public void setFrontAngle(double rotation_offset)
 	{
 		_rotation_offset = rotation_offset;
+	}
+	
+	/**
+	 * Programmatically switch the direction the robot goes when the stick gets pushed
+	 */
+	private double[] front_side(double[] input) {
+		double[] dir_offset = new double[3];
+		dir_offset[0] = input[0] * Math.cos(_rotation_offset) + input[1] * Math.sin(_rotation_offset);
+		dir_offset[1] = input[1] * Math.cos(_rotation_offset) - input[0] * Math.sin(_rotation_offset);
+		dir_offset[2] = input[2];
+		return dir_offset;
+	}
+	
+	/**
+	 * Orbit point
+	 */
+	private double[] orbit_point(double[] input) {
+		double x = _orbit_point[0];
+		double y = _orbit_point[1];
+
+		double[] k = { y - 1, y + 1, 1 - x, -1 - x };
+
+		double p = Math.sqrt((k[0] * k[0] + k[2] * k[2]) / 2) * Math.cos((Math.PI / 4) + Math.atan2(k[0], k[2]));
+		double r = Math.sqrt((k[1] * k[1] + k[2] * k[2]) / 2) * Math.cos(-(Math.PI / 4) + Math.atan2(k[1], k[2]));
+		double q = -Math.sqrt((k[1] * k[1] + k[3] * k[3]) / 2) * Math.cos((Math.PI / 4) + Math.atan2(k[1], k[3]));
+
+		double[] corrected = new double[3];
+		corrected[0] = (input[2] * r + (input[0] - input[2]) * q + input[0] * p) / (q + p);
+		corrected[1] = (-input[2] * r + input[1] * q - (-input[1] - input[2]) * p) / (q + p);
+		corrected[2] = (2 * input[2]) / (q + p);
+		return corrected;
+	}
+	
+	public void setOrbitPoint(double[] orbit_point)
+	{
+		_orbit_point = orbit_point;
+	}
+	
+	/**
+	 * Detented controller correction methods (and helper methods)
+	 */
+	private double[] detents(double[] input) {
+
+		double theta = Math.atan2(input[0], input[1]);
+
+		double dx = correct_x(theta) * distance(input[1], input[0]) * 0.25;
+		double dy = correct_y(theta) * distance(input[1], input[0]) * 0.25;
+
+		double[] detented = new double[3];
+
+		detented[0] = input[0] + dy; // y
+		detented[1] = input[1] + dx; // x
+		detented[2] = input[2];// angular
+
+		return detented;
+	}
+	private double correct_x(double theta) {
+		return -Math.sin(theta) * (-Math.sin(8 * theta) - 0.25 * Math.sin(4 * theta));
+	}
+	private double correct_y(double theta) {
+		return Math.cos(theta) * (-Math.sin(8 * theta) - 0.25 * Math.sin(4 * theta));
+	}
+	private double distance(double x, double y) {
+		return Math.sqrt(x * x + y * y);
 	}
 	
 	/**
@@ -306,6 +371,19 @@ public class Drive implements Updatable {
 				if(_new_data)
 				{
 					// Don't do the fancy driver convenience stuff when we're PID controlling
+					if(_ds.isOperatorControl())
+					{
+						// Detents
+						input = detents(input);
+						// Frontside
+						input = front_side(input);
+						// Orbit point
+						input = orbit_point(input);
+						// Glide
+						//input = _glide.gain_adjust(input);
+						
+						_input = input;
+					}
 					
 					_new_data = false;
 					dump = true;
@@ -328,7 +406,7 @@ public class Drive implements Updatable {
 					{
 						_dump_thread = new Thread(new Runnable() {
 							public void run() {
-								//dump();
+								dump();
 							}
 						});
 						_dump_thread.start();

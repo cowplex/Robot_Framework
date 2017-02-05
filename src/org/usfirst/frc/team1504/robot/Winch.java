@@ -17,6 +17,8 @@ public class Winch implements Updatable
 	
 	protected Winch()
 	{
+		_winch_motor_nancy.enableBrakeMode(false);
+		_winch_motor_mead.enableBrakeMode(false);
 		Update_Semaphore.getInstance().register(this);
 	}
 	
@@ -35,6 +37,7 @@ public class Winch implements Updatable
 		
 		// Run that thang!
 		_winch_motor_nancy.set(IO.winch_input());
-		_winch_motor_mead.set(IO.winch_input());
+		_winch_motor_mead.set(-1.0 * IO.winch_input());
+		//_winch_motor_mead.reverseOutput(true);
 	}
 }
