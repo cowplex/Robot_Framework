@@ -61,7 +61,7 @@ public class Update_Semaphore
 		
 		// Let's see about this. Creating several threads at 20hz might be an overhead issue...
 //		Thread t = new Thread();
-//		_tlist.add(t);
+//		_thread_pool.add(t);
 		
 		
 		_thread_pool.add(

@@ -19,25 +19,26 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends RobotBase {
 	
-	private DigitBoard _db = DigitBoard.getInstance();
-	private Digit_Board _digit_board = Digit_Board.getInstance();
 	private Update_Semaphore _semaphore = Update_Semaphore.getInstance();
 	private Logger _logger = Logger.getInstance();
-	private Autonomous _autonomous = Autonomous.getInstance();
-	//Pneumatics t3 = Pneumatics.getInstance();
-	Drive t5 = Drive.getInstance();
 	private Arduino _arduino = Arduino.getInstance();
 	private Groundtruth _groundtruth = Groundtruth.getInstance();
 	private Thread _dashboard_task;
-	private CameraInterface ci = CameraInterface.getInstance();
-	private Winch w = Winch.getInstance();
-	
 	
     /**
      * Create a new Robot
      */
     public Robot() {
     	super();
+    	Drive.initialize();
+    	
+    	DigitBoard.initialize();
+    	Digit_Board.initialize();
+    	Autonomous.initialize();
+    	//Pneumatics.initialize();
+    	CameraInterface.initialize();
+    	Winch.initialize();
+    	
     	//System.out.println(new String(Base64.getDecoder().decode(Map.TEAM_BANNER)));
     }
 
@@ -56,8 +57,8 @@ public class Robot extends RobotBase {
 				char edge_track = 0;
 				while(true)
 				{	
-					//SmartDashboard.putNumber("Robot Current", pdp.getTotalCurrent());
-					//SmartDashboard.putNumber("Robot PDP Temperature", pdp.getTemperature());
+					SmartDashboard.putNumber("Robot Current", pdp.getTotalCurrent());
+					SmartDashboard.putNumber("Robot PDP Temperature", pdp.getTemperature());
 					SmartDashboard.putNumber("Robot Voltage", m_ds.getBatteryVoltage());
 					SmartDashboard.putNumber("Robot Time", m_ds.getMatchTime());
 										
