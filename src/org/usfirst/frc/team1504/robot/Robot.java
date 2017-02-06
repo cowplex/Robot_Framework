@@ -61,6 +61,8 @@ public class Robot extends RobotBase {
 					SmartDashboard.putNumber("Robot PDP Temperature", pdp.getTemperature());
 					SmartDashboard.putNumber("Robot Voltage", m_ds.getBatteryVoltage());
 					SmartDashboard.putNumber("Robot Time", m_ds.getMatchTime());
+					
+					SmartDashboard.putNumber("Robot Thread Count", Thread.getAllStackTraces().keySet().size());
 										
 					// Get image from groundtruth sensor on rising edge of roboRIO User button
 					edge_track = (char)( ( (edge_track << 1) + (HALUtil.getFPGAButton() ? 1 : 0) ) & 3);

@@ -1,8 +1,11 @@
 package org.usfirst.frc.team1504.robot;
 
+import org.usfirst.frc.team1504.Utils.VisionThreadSingleFrame;
+
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.vision.VisionRunner;
 
 public class CameraInterface
 {
@@ -34,6 +37,21 @@ public class CameraInterface
 			server_ports += "\t" + _servers[i].getName() + " at port " + _servers[i].getPort() + "\n";
 		
 		System.out.print("Camera Interface Initialized\n" + server_ports);
+		
+		GripPipeline _pipe = new GripPipeline();
+		//VisionRunner<VisionPipeline> _runner = new VisionRunner<>(_cameras[get_active_camera().ordinal()], _pipe, null);
+		//_runner.runOnce();
+		VisionRunner.Listener<GripPipeline> _listener = new VisionRunner.Listener<GripPipeline>() {
+			private int called_times = 0;
+			public void copyPipelineOutputs(GripPipeline pipeline) { System.out.println("Image processed "+(++called_times)+" times"); }
+		};
+		VisionThreadSingleFrame test = new VisionThreadSingleFrame(_cameras[CAMERAS.GEARSIDE.ordinal()], _pipe, _listener);
+		test.processImage();
+		System.out.println("Image processed in " + test.lastExecutionTime());
+		test.processImage();
+		System.out.println("Image processed in " + test.lastExecutionTime());
+		test.processImage();
+		System.out.println("Image processed in " + test.lastExecutionTime());
 	}
 	
 	public static CameraInterface getInstance()
