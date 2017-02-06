@@ -36,7 +36,7 @@ public class Robot extends RobotBase {
     	Digit_Board.initialize();
     	Autonomous.initialize();
     	//Pneumatics.initialize();
-    	CameraInterface.initialize();
+   // 	CameraInterface.initialize();
     	Winch.initialize();
     	
     	//System.out.println(new String(Base64.getDecoder().decode(Map.TEAM_BANNER)));
@@ -57,8 +57,8 @@ public class Robot extends RobotBase {
 				char edge_track = 0;
 				while(true)
 				{	
-					SmartDashboard.putNumber("Robot Current", pdp.getTotalCurrent());
-					SmartDashboard.putNumber("Robot PDP Temperature", pdp.getTemperature());
+					//SmartDashboard.putNumber("Robot Current", pdp.getTotalCurrent());
+					//SmartDashboard.putNumber("Robot PDP Temperature", pdp.getTemperature());
 					SmartDashboard.putNumber("Robot Voltage", m_ds.getBatteryVoltage());
 					SmartDashboard.putNumber("Robot Time", m_ds.getMatchTime());
 					

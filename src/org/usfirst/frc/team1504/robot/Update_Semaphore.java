@@ -18,6 +18,8 @@ public class Update_Semaphore
 	private Logger _logger = Logger.getInstance();
 	private long _last_update;
 	
+	private Object _test = new Object();
+	
 	private static final Update_Semaphore instance = new Update_Semaphore();
 	//private int _clear_mask_rising_edge;
 	//private int _clear_mask;
@@ -71,11 +73,14 @@ public class Update_Semaphore
 							public void run()
 							{
 								System.out.println("\tSemaphore - starting pool thread for " + update_class.getClass().getName());
-								Update_Semaphore semaphore = Update_Semaphore.getInstance();
+								//Update_Semaphore semaphore = Update_Semaphore.getInstance();
 								while(true)
 								{
 									try {
-										semaphore.wait(); // Will wait indefinitely until notified
+										synchronized (_test)
+										{
+											_test.wait(); // Will wait indefinitely until notified
+										}
 										update_class.semaphore_update();
 									} catch (InterruptedException error) {
 										error.printStackTrace();
@@ -102,7 +107,10 @@ public class Update_Semaphore
 		_last_update = System.currentTimeMillis();
 		dump();
 		
-		this.notifyAll();
+		synchronized (_test)
+		{
+			_test.notifyAll();
+		}
 	}
 	/*public void newData()
 	{

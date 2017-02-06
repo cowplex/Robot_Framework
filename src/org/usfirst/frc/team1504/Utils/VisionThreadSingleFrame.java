@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.vision.VisionRunner;
 public class VisionThreadSingleFrame
 {
 	private long _last_run_time = 0;
+	private Object _lock = new Object();
 	/**
 	 * Creates a vision thread that runs a {@link VisionPipeline} on request.
 	 *
@@ -15,7 +16,6 @@ public class VisionThreadSingleFrame
 	public VisionThreadSingleFrame(VisionRunner<?> visionRunner)
 	{
 		// Spawn a thread that will process a single frame using the VisionRunner when notified.
-		VisionThreadSingleFrame instance = this;
 		new Thread(
 				new Runnable()
 				{
@@ -25,7 +25,10 @@ public class VisionThreadSingleFrame
 						while(true)
 						{
 							try {
-								instance.wait(); // Will wait indefinitely until notified
+								synchronized(_lock)
+								{
+									_lock.wait(); // Will wait indefinitely until notified
+								}
 								
 								long start_time = System.currentTimeMillis();
 								visionRunner.runOnce();
@@ -57,7 +60,10 @@ public class VisionThreadSingleFrame
 	
 	public void processImage()
 	{
-		this.notifyAll();
+		synchronized(_lock)
+		{
+			_lock.notifyAll();
+		}
 	}
 	
 	public long lastExecutionTime()

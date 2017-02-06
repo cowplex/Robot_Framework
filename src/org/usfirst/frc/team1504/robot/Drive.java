@@ -112,6 +112,7 @@ public class Drive implements Updatable {
 	 */
 	public void semaphore_update()
 	{
+System.out.println("Sem update");
 		// Get new values from the map
 		// Do all configurating first (orbit, front, etc.)
 		if(!_ds.isAutonomous())
