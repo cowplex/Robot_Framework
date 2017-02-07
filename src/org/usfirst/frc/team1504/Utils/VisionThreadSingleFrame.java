@@ -7,7 +7,8 @@ import edu.wpi.first.wpilibj.vision.VisionRunner;
 public class VisionThreadSingleFrame
 {
 	private long _last_run_time = 0;
-	private Object _lock = new Object();
+	private final Object _lock = new Object();
+	private volatile boolean _run = false;
 	/**
 	 * Creates a vision thread that runs a {@link VisionPipeline} on request.
 	 *
@@ -27,7 +28,9 @@ public class VisionThreadSingleFrame
 							try {
 								synchronized(_lock)
 								{
-									_lock.wait(); // Will wait indefinitely until notified
+									while(!_run) // Prevent spurious wakeups from running code
+										_lock.wait(); // Will wait indefinitely until notified
+									_run = false;
 								}
 								
 								long start_time = System.currentTimeMillis();
@@ -62,6 +65,7 @@ public class VisionThreadSingleFrame
 	{
 		synchronized(_lock)
 		{
+			_run = true;
 			_lock.notifyAll();
 		}
 	}
