@@ -1,3 +1,6 @@
 /org/
 *.class
 *.jar
+/UploadCode.sh
+/CTRE_FRCLibs_NON-WINDOWS/
+/build/
