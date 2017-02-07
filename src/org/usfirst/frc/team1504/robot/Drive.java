@@ -305,7 +305,11 @@ System.out.println("Sem update");
 		for(int i = 0; i < _motors.length; i++)
 		{
 			// There are no Sync Groups for CANTalons. Apparently.
-			_motors[i].set(values[i] * Map.DRIVE_OUTPUT_MAGIC_NUMBERS[i]);
+			try
+			{
+				_motors[i].set(values[i] * Map.DRIVE_OUTPUT_MAGIC_NUMBERS[i]);
+			}
+			catch(Exception e) { }
 		}
 	}
 	
