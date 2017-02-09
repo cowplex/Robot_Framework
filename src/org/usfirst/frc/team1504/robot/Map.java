@@ -7,7 +7,7 @@ public class Map {
 	public static final double UTIL_JOYSTICK_DEADZONE = 0.05;
 	
 	public static final int UTIL_DRIVE_OVERRIDE_BUTTON = 11;
-	public static final int UTIL_OPERATOR_OVERRIDE_BUTTON = 1;
+	public static final int UTIL_OPERATOR_OVERRIDE_BUTTON = 11;
 	
 /**
  * Inputs
@@ -100,6 +100,11 @@ public class Map {
 	public static final double VISION_INTERFACE_AIM_DEADZONE = 0.75; //1; //0.075;
 	public static final double VISION_INTERFACE_TURN_MAX_OUTPUT = 0.15;
 	public static final int VISION_INTERFACE_IMAGE_CAPTURE_SETTLE_TIMEOUT = 1750;
+
+/**
+ * Shooter stuff
+ */
+	public static final int SHOOTER_FIRE_BUTTON = 1;
 	
 /**
  * Winch stuff

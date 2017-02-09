@@ -85,7 +85,7 @@ public class Drive implements Updatable {
 	private Logger _logger = Logger.getInstance();
 	private volatile boolean _new_data = false;
 	private volatile double[] _input = {0.0, 0.0, 0.0};
-	private volatile double _rotation_offset = 180.0;
+	private volatile double _rotation_offset = 0.0;
 	private volatile double[] _orbit_point = {0.0, 0.0}; //{0.0, 1.15};
 	private DriveGlide _glide = new DriveGlide();
 	private Groundtruth _groundtruth = Groundtruth.getInstance();
@@ -112,7 +112,6 @@ public class Drive implements Updatable {
 	 */
 	public void semaphore_update()
 	{
-System.out.println("Sem update");
 		// Get new values from the map
 		// Do all configurating first (orbit, front, etc.)
 		if(!_ds.isAutonomous())
@@ -150,6 +149,11 @@ System.out.println("Sem update");
 	public void setFrontAngle(double rotation_offset)
 	{
 		_rotation_offset = rotation_offset;
+	}
+	
+	public void setFrontAngleDegrees(double rotation_offset)
+	{
+		setFrontAngle(rotation_offset * Math.PI / 180.0);
 	}
 	
 	/**
@@ -326,6 +330,8 @@ System.out.println("Sem update");
 		SmartDashboard.putNumber("Drive input forward", _input[0]);
 		SmartDashboard.putNumber("Drive input right", _input[1]);
 		SmartDashboard.putNumber("Drive input anticlockwise", _input[2]);
+		
+		SmartDashboard.putNumber("Drive rotation offset", _rotation_offset);
 		
 		SmartDashboard.putNumber("Drive FL current", currents[0]);
 		SmartDashboard.putNumber("Drive BL current", currents[1]);

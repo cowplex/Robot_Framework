@@ -40,6 +40,13 @@ public class IO
 		return (_drive_rotation.getRawButton(4) ? -1.0 : 0.0) + (_drive_rotation.getRawButton(5) ? 1.0 : 0.0);
 	}
 
+/**
+ * Shooter Stuff
+ */
+	public static boolean shooter_enable()
+	{
+		return _operator_joystick.getRawButton(Map.SHOOTER_FIRE_BUTTON);
+	}
 	
 /**
  * Winch stuff

@@ -37,7 +37,8 @@ public class Robot extends RobotBase {
     	Autonomous.initialize();
     	//Pneumatics.initialize();
    // 	CameraInterface.initialize();
-    	Winch.initialize();
+    	//Winch.initialize();
+    	Shooter.initialize();
     	
     	//System.out.println(new String(Base64.getDecoder().decode(Map.TEAM_BANNER)));
     }
@@ -67,7 +68,13 @@ public class Robot extends RobotBase {
 					// Get image from groundtruth sensor on rising edge of roboRIO User button
 					edge_track = (char)( ( (edge_track << 1) + (HALUtil.getFPGAButton() ? 1 : 0) ) & 3);
 					if(edge_track == 1) // Get image from groundtruth sensors, output it to the DS
-						SmartDashboard.putString("Groundtruth raw image", new String(_arduino.getSensorImage()));
+					{
+						char t[] = new char[324 * 2];
+						for(int i = 0; i < t.length; i++)
+							t[i] = (char)(Math.random() * 255);
+						SmartDashboard.putString("Groundtruth raw image", new String(t));
+					}
+						//SmartDashboard.putString("Groundtruth raw image", new String(_arduino.getSensorImage()));
 
 					_groundtruth.dashboard_update();
 					
