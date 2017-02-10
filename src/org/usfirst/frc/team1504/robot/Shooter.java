@@ -23,8 +23,8 @@ public class Shooter implements Updatable
 	private boolean _override = false;
 	private long _shot_estimate = 0;
 	
-	private double PID_values[][] = {{.03, .00015}, {.04, .00015}};
-	private double PID_DEADZONE = 30;
+	private double PID_values[][] = {{.03, .00015}, {.05, .00017}};
+	private double PID_DEADZONE = 50;
 	
 	protected Shooter()
 	{
@@ -113,13 +113,13 @@ public class Shooter implements Updatable
 		if(SmartDashboard.getNumber("Shooter Target Speed", 0.0) != getTargetSpeed())
 			setTargetSpeed(SmartDashboard.getNumber("Shooter Target Speed", 0.0));
 		
-		if(_enabled)
+//		if(_enabled)
+		if(SmartDashboard.getBoolean("Shooter enable", false))
 		{
-		//if(SmartDashboard.getBoolean("Shooter enable", false))
 			//_shooter_motor.set(SmartDashboard.getNumber("Shooter Target Speed", 0.0));
 			_shooter_motor.set(-getTargetSpeed());
 			
-			/*if(Math.abs(_shooter_motor.getSpeed() + getTargetSpeed()) < PID_DEADZONE)
+			if(Math.abs(_shooter_motor.getSpeed() + getTargetSpeed()) < PID_DEADZONE)
 			{
 				_shooter_motor.setP(PID_values[1][0]);
 				_shooter_motor.setI(PID_values[1][1]);
@@ -128,7 +128,7 @@ public class Shooter implements Updatable
 			{
 				_shooter_motor.setP(PID_values[0][0]);
 				_shooter_motor.setI(PID_values[0][1]);
-			}*/
+			}
 		}
 		else
 		{

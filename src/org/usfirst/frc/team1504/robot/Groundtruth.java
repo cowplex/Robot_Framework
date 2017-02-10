@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Groundtruth implements Updatable {
 	private static final Groundtruth instance = new Groundtruth();
 	
+	private static final int DATA_MAP[] = {2, -1, 3, -4, 5, 6};
+	
 	private Logger _logger = Logger.getInstance();
 	private Arduino _arduino = Arduino.getInstance();
 	private DriverStation _driver_station = DriverStation.getInstance();
@@ -103,7 +105,8 @@ public class Groundtruth implements Updatable {
 	public void getData()
 	{
 		byte[] data = _arduino.getSensorData();
-		_current_data = data;
+		for(int i = 0; i < DATA_MAP.length; i++)
+			_current_data[i] = (byte) (Math.signum(DATA_MAP[i]) * data[Math.abs(DATA_MAP[i]) - 1]);
 		
 		if(_driver_station.isEnabled())
 			compute(data);
@@ -117,8 +120,8 @@ public class Groundtruth implements Updatable {
 		
 		// Data format: LEFT_X LEFT_Y LEFT_SQUAL RIGHT_X RIGHT_Y RIGHT_SQUAL
 		//_raw_data.set(0, (byte) (_raw_data.get(0) + 1));
-		//for(byte b : data)
-		//	_raw_data.add(b);
+		for(byte b : data)
+			_raw_data.add(b);
 		
 		if(data[2] < Map.GROUNDTRUTH_QUALITY_MINIMUM || data[5] < Map.GROUNDTRUTH_QUALITY_MINIMUM)
 		{
@@ -189,8 +192,8 @@ public class Groundtruth implements Updatable {
 
 	public void semaphore_update()
 	{
-		return;
-		/*if(_raw_data.get(0) == 0)
+		//return;
+		if(_raw_data.get(0) == 0)
 			return;
 		
 		byte[] data = new byte[_raw_data.size()];
