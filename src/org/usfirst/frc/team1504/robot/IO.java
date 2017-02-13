@@ -56,4 +56,9 @@ public class IO
 	{
 		return Utils.deadzone(Math.abs(_operator_joystick.getRawAxis(Map.WINCH_POWER_AXIS))) * Map.WINCH_DIRECTION;
 	}
+	
+	public static boolean deploy_winch()
+	{
+		return _operator_joystick.getRawButtonOnRisingEdge(Map.WINCH_DEPLOY_BUTTON);
+	}
 }

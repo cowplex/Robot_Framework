@@ -20,6 +20,17 @@ public class Map {
 	// Joystick inputs
 	
 /**
+ * Robot config
+ */
+	public static final double ROBOT_GEARSIDE_OFFSET_DEG = 0.0;
+	public static final double ROBOT_INTAKESIDE_OFFSET_DEG = 180.0;
+	public static final double ROBOT_WINCHSIDE_OFFSET_DEG = 240.0;
+	
+	// When the warning lights on the robot will kick in to tell you when to hang
+	public static final double ROBOT_WARNING_TIME_LONG = 20.0;
+	public static final double ROBOT_WARNING_TIME_SHORT = 10.0;
+	
+/**
  * Drive class things
  */
 	
@@ -115,6 +126,9 @@ public class Map {
 	public static final int WINCH_POWER_AXIS = 1;
 	
 	public static final double WINCH_DIRECTION = 1.0;
+	
+	public static final int WINCH_DEPLOY_BUTTON = 2;
+	public static final double WINCH_BRAKE_TIMEOUT = 15.0;
 	
 /**
  * Logger stuff

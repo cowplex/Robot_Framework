@@ -1,20 +1,9 @@
 package org.usfirst.frc.team1504.vision;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.HashMap;
-
 import org.opencv.core.*;
-import org.opencv.core.Core.*;
-import org.opencv.features2d.FeatureDetector;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.*;
-import org.opencv.objdetect.*;
 
 /**
 * GreenDetectFastBoiler class.
@@ -42,13 +31,13 @@ public class GreenDetectFastBoiler_split {
 	 */
 	public void process(Mat source0) {
 		// Step CV_extractChannel0:
-		Mat cvExtractchannel0Src = source0;
-		double cvExtractchannel0Channel = 1.0;
+		//Mat cvExtractchannel0Src = source0;
+		//double cvExtractchannel0Channel = 1.0;
 		//cvExtractchannel(cvExtractchannel0Src, cvExtractchannel0Channel, cvExtractchannel0Output);
 
 		// Step CV_extractChannel1:
-		Mat cvExtractchannel1Src = source0;
-		double cvExtractchannel1Channel = 2.0;
+		//Mat cvExtractchannel1Src = source0;
+		//double cvExtractchannel1Channel = 2.0;
 		//cvExtractchannel(cvExtractchannel1Src, cvExtractchannel1Channel, cvExtractchannel1Output);
 		ArrayList<Mat> split = new ArrayList<Mat>();
 		Core.split(source0, split);
@@ -145,9 +134,9 @@ public class GreenDetectFastBoiler_split {
 	 * @param channel zero indexed channel number to extract.
 	 * @param dst output image.
 	 */
-	private void cvExtractchannel(Mat src, double channel, Mat dst) {
-		Core.extractChannel(src, dst, (int)channel);
-	}
+	//private void cvExtractchannel(Mat src, double channel, Mat dst) {
+	//	Core.extractChannel(src, dst, (int)channel);
+	//}
 
 	/**
 	 * Subtracts the second Mat from the first.

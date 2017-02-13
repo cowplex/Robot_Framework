@@ -17,7 +17,8 @@ public class Shooter implements Updatable
 	private static Preferences _preferences = Preferences.getInstance();
 	
 	private CANTalon _shooter_motor = new CANTalon(21);
-	private CANTalon _hopper_motor;
+	//private CANTalon _hopper_motor = new CANTalon(31);
+	//private CANTalon _turret_motor;
 	
 	private boolean _enabled  = false;
 	private boolean _override = false;
@@ -93,6 +94,24 @@ public class Shooter implements Updatable
 	}
 	
 	/**
+	 * Returns the current actual speed of the shooter
+	 * @return Shooter speed (in RPM)
+	 */
+	public double getCurrentSpeed()
+	{
+		return _shooter_motor.getSpeed();
+	}
+	
+	/**
+	 * Returns a boolean signifying whether or not the shooter is at its target speed
+	 * @return Boolean signifying if the shooter is at its target speed
+	 */
+	public boolean getSpeedGood()
+	{
+		return (Math.abs(_shooter_motor.getSpeed() + getTargetSpeed()) < PID_DEADZONE);
+	}
+	
+	/**
 	 * Override the vision system to force the shooter to fire when at speed and ignore the camera
 	 * @param override - True to override the camera input and fire when at speed
 	 */
@@ -113,21 +132,22 @@ public class Shooter implements Updatable
 		if(SmartDashboard.getNumber("Shooter Target Speed", 0.0) != getTargetSpeed())
 			setTargetSpeed(SmartDashboard.getNumber("Shooter Target Speed", 0.0));
 		
-//		if(_enabled)
-		if(SmartDashboard.getBoolean("Shooter enable", false))
+		if(_enabled)
+//		if(SmartDashboard.getBoolean("Shooter enable", false))
 		{
-			//_shooter_motor.set(SmartDashboard.getNumber("Shooter Target Speed", 0.0));
 			_shooter_motor.set(-getTargetSpeed());
 			
-			if(Math.abs(_shooter_motor.getSpeed() + getTargetSpeed()) < PID_DEADZONE)
+			if(getSpeedGood() || _override)
 			{
 				_shooter_motor.setP(PID_values[1][0]);
 				_shooter_motor.setI(PID_values[1][1]);
+				//_hopper_motor.set(1.0);
 			}
 			else
 			{
 				_shooter_motor.setP(PID_values[0][0]);
 				_shooter_motor.setI(PID_values[0][1]);
+				//_hopper_motor.set(0.0);
 			}
 		}
 		else
@@ -135,10 +155,11 @@ public class Shooter implements Updatable
 			_shooter_motor.setP(PID_values[0][0]);
 			_shooter_motor.setI(PID_values[0][1]);
 			_shooter_motor.set(0);
+			//_hopper_motor.set(0.0);
 		}
 		
-		SmartDashboard.putNumber("Shooter Speed", _shooter_motor.getSpeed());
-		SmartDashboard.putBoolean("Shooter At Speed", Math.abs(_shooter_motor.getSpeed() + getTargetSpeed()) < PID_DEADZONE);
+		SmartDashboard.putNumber("Shooter Speed", getCurrentSpeed());
+		SmartDashboard.putBoolean("Shooter At Speed", getSpeedGood());
 	}
 
 }

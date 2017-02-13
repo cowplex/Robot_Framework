@@ -56,30 +56,61 @@ public class Robot extends RobotBase {
 			public void run() {
 				PowerDistributionPanel pdp = new PowerDistributionPanel();
 				char edge_track = 0;
+				
+				boolean warnings[] = {false, false};
+				
+				int pos[] = {0, 256, 256*2};
 				while(true)
 				{
 					SmartDashboard.putNumber("Robot Current", pdp.getTotalCurrent());
 					SmartDashboard.putNumber("Robot PDP Temperature", pdp.getTemperature());
 					SmartDashboard.putNumber("Robot Voltage", m_ds.getBatteryVoltage());
 					SmartDashboard.putNumber("Robot Time", m_ds.getMatchTime());
-					
 					SmartDashboard.putNumber("Robot Thread Count", Thread.getAllStackTraces().keySet().size());
 										
 					// Get image from groundtruth sensor on rising edge of roboRIO User button
 					edge_track = (char)( ( (edge_track << 1) + (HALUtil.getFPGAButton() ? 1 : 0) ) & 3);
 					if(edge_track == 1) // Get image from groundtruth sensors, output it to the DS
-					{
-						/*char t[] = new char[324 * 2];
+						SmartDashboard.putString("Groundtruth raw image", new String(_arduino.getSensorImage()));
+					
+					/*{
+						char t[] = new char[324 * 2];
 						for(int i = 0; i < t.length; i++)
 							t[i] = (char)(Math.random() * 255);
-						SmartDashboard.putString("Groundtruth raw image", new String(t));*/
-					
-						SmartDashboard.putString("Groundtruth raw image", new String(_arduino.getSensorImage()));
-						System.out.println("Groundtruth Updated");
-					}
+						SmartDashboard.putString("Groundtruth raw image", new String(t));
+					}*/
 					_groundtruth.dashboard_update();
 					
+					if(m_ds.isOperatorControl())
+					{
+						if(m_ds.getMatchTime() < Map.ROBOT_WARNING_TIME_LONG && !warnings[0])
+						{
+							warnings[0] = true;
+							_arduino.setPulseSpeed(5);
+							_arduino.setPartyMode(Arduino.PARTY_MODE.ON);
+						}
+						else if(m_ds.getMatchTime() < Map.ROBOT_WARNING_TIME_SHORT && !warnings[1])
+						{
+							warnings[1] = true;
+							_arduino.setPulseSpeed(15);
+							_arduino.setPartyMode(Arduino.PARTY_MODE.ON);
+							_arduino.setGearLights(Arduino.GEAR_MODE.PULSE);
+						}
+					}
+					else if(warnings[0] || warnings[1])// if(m_ds.isDisabled())
+					{
+						warnings[0] = warnings[1] = false;
+					}
+					
 					Timer.delay(.05);
+					
+					for(int i = 0; i < pos.length; i++)
+						pos[i] = (pos[i] + 25) % (255*3);
+					//System.out.println(pos[0]);
+					char rgb[] = {0, 0, 0};
+					for(int i = 0; i < rgb.length; i++)
+						rgb[i] = (char) (pos[i] < 255 ? pos[i] : (pos[i] < 255*2 ? 255 : (255*3 - pos[i])));
+					_arduino.setMainLightsColor(rgb[0], rgb[1], rgb[2]);
 				}
 			}
 		});

@@ -86,7 +86,7 @@ public class Drive implements Updatable {
 	private volatile boolean _new_data = false;
 	private volatile double[] _input = {0.0, 0.0, 0.0};
 	private volatile double _rotation_offset = 0.0;
-	private volatile double[] _orbit_point = {0.0, 0.0}; //{0.0, 1.15};
+	private volatile double[] _orbit_point = {0.0, -1.15}; //{0.0, 1.15};
 	private DriveGlide _glide = new DriveGlide();
 	private Groundtruth _groundtruth = Groundtruth.getInstance();
 	

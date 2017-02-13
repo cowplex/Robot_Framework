@@ -1,6 +1,7 @@
 package org.usfirst.frc.team1504.robot;
 
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.Timer;
 
 public class Arduino
 {
@@ -70,12 +71,13 @@ public class Arduino
 				if (i == 0)
 				{
 					_bus.writeBulk(buffer);
+					Timer.delay(.1);
 				}
 				else
 				{
 					_bus.transaction(buffer, buffer.length, incoming_img_data, incoming_img_data.length);
 					for(int j = 0; j < incoming_img_data.length; j++)
-						final_image[((i - 1) * 24) + j] = (char) incoming_img_data[j];
+						final_image[((i - 1) * 24) + j] = (char) ((char) incoming_img_data[j] & 63);
 				}
 			}
 
