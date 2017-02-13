@@ -34,6 +34,8 @@ public class Drive implements Updatable {
 	
 	private Thread _task_thread;
 	private Thread _dump_thread;
+	private Object _dump_lock;
+	private boolean _dump = false;
 	private volatile boolean _thread_alive = true;
 	
 	private char _direction = 0;
@@ -64,6 +66,28 @@ public class Drive implements Updatable {
 		Update_Semaphore.getInstance().register(this);
 		
 		DriveInit();
+		
+		_dump_lock = new Object();
+		_dump_thread = new Thread(new Runnable() {
+			public void run() {
+				synchronized (_dump_lock)
+				{
+					try
+					{
+						while(!_dump)
+							_dump_lock.wait();
+					}
+					catch (InterruptedException e)
+					{
+						e.printStackTrace();
+					}
+					
+					_dump = false;
+					dump();
+				}
+			}
+		});
+		_dump_thread.start();
 		
 		_timer.scheduleAtFixedRate(_osc, 0, 250);
 		
@@ -376,7 +400,6 @@ public class Drive implements Updatable {
 	{
 		// Damn you, Java, and your lack of local static variables!
 		double[] input;
-		boolean dump = false;
 		
 		while(_thread_alive)
 		{
@@ -402,7 +425,7 @@ public class Drive implements Updatable {
 					}
 					
 					_new_data = false;
-					dump = true;
+					_dump = true;
 				}
 								
 				// Ground speed offset
@@ -415,19 +438,14 @@ public class Drive implements Updatable {
 				_loops_since_last_dump++;
 				
 				// Log on new data, after the first computation
-				if(dump || _loops_since_last_dump > Map.DRIVE_MAX_UNLOGGED_LOOPS)
+				if(_dump || _loops_since_last_dump > Map.DRIVE_MAX_UNLOGGED_LOOPS)
 				{
 					// Dump in a separate thread, so we can loop as fast as possible
-					if(_dump_thread == null || !_dump_thread.isAlive())
+					synchronized (_dump_lock)
 					{
-						_dump_thread = new Thread(new Runnable() {
-							public void run() {
-								dump();
-							}
-						});
-						_dump_thread.start();
+						_dump_lock.notifyAll();
 					}
-					dump = false;
+					//_dump = false;
 				}
 			}
 			else
