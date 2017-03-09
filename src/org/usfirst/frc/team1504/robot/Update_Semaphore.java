@@ -50,7 +50,7 @@ public class Update_Semaphore
 		}
 	}
 	
-	private List<Updatable> _list = new ArrayList<Updatable>();
+	private List<Updatable> _joystick_list = new ArrayList<Updatable>();
 	private List<Pool_Thread> _thread_pool = new ArrayList<Pool_Thread>();
 	private Logger _logger = Logger.getInstance();
 	private long _last_update;
@@ -77,10 +77,15 @@ public class Update_Semaphore
 	
 	public void register(Updatable update_class)
 	{
-		_list.add(update_class);
-		
-		_thread_pool.add(new Pool_Thread(_lock, update_class));
-		new Thread(_thread_pool.get(_thread_pool.size() - 1)).start();		
+		if(update_class.getClass() == Latch_Joystick.class)
+		{
+			_joystick_list.add(update_class);
+		}
+		else
+		{
+			_thread_pool.add(new Pool_Thread(_lock, update_class));
+			new Thread(_thread_pool.get(_thread_pool.size() - 1)).start();	
+		}
 		
 		System.out.println("\tSemaphore - registered " + update_class.getClass().getName());
 	}
@@ -98,6 +103,11 @@ public class Update_Semaphore
 		_last_update = System.currentTimeMillis();
 		dump();
 		
+		// Update joysticks before running any other update methods
+		for(Updatable js : _joystick_list)
+			js.semaphore_update();
+		
+		// Run all pool threads to update registered classes
 		synchronized (_lock)
 		{
 			for(Pool_Thread item : _thread_pool)

@@ -94,6 +94,6 @@ public class IO
 	
 	public static boolean deploy_winch()
 	{
-		return _operator_joystick.getRawButton(Map.WINCH_DEPLOY_BUTTON);
+		return _operator_joystick.getRawButtonOnRisingEdge(Map.WINCH_DEPLOY_BUTTON);
 	}
 }
