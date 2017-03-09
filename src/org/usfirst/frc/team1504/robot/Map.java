@@ -24,7 +24,7 @@ public class Map {
  */
 	public static final double ROBOT_GEARSIDE_OFFSET_DEG = 0.0;
 	public static final double ROBOT_INTAKESIDE_OFFSET_DEG = 180.0;
-	public static final double ROBOT_WINCHSIDE_OFFSET_DEG = 240.0;
+	public static final double ROBOT_WINCHSIDE_OFFSET_DEG = 90;//270.0;
 	
 	// When the warning lights on the robot will kick in to tell you when to hang
 	public static final double ROBOT_WARNING_TIME_LONG = 20.0;
@@ -50,19 +50,19 @@ public class Map {
 	};
 	
 	// Drive Input magic numbers
-	public static final double[] DRIVE_INPUT_MAGIC_NUMBERS = { 1.0, -1.0, 0.6 };
+	public static final double[] DRIVE_INPUT_MAGIC_NUMBERS = { -1.0, 1.0, -0.6 };
 	public static final double DRIVE_INPUT_TURN_FACTOR = 0.2;
 	public static final int DRIVE_INPUT_TURN_FACTOR_OVERRIDE_BUTTON = 1;
 	
 	// Drive Front Side changing
-	public static final int DRIVE_FRONTSIDE_FRONT = 3;
-	public static final int DRIVE_FRONTSIDE_BACK = 2;
+	public static final int DRIVE_FRONTSIDE_FRONT = 1;
+	public static final int DRIVE_FRONTSIDE_BACK = 1;
 	
 	// Glide gain
 	public static final double[][] DRIVE_GLIDE_GAIN = {{0.0015, 0.003}, {0.008, 0.008}};
 	
 	// Drive Output magic numbers - for getting everything spinning the correct direction
-	public static final double[] DRIVE_OUTPUT_MAGIC_NUMBERS = { -1.0, -1.0, 1.0, 1.0 };	
+	public static final double[] DRIVE_OUTPUT_MAGIC_NUMBERS = { 1.0, 1.0, -1.0, -1.0 };	
 	
 	public static final int DRIVE_MAX_UNLOGGED_LOOPS = 15;
 	
@@ -103,19 +103,13 @@ public class Map {
 /**
  * Vision Interface stuff
  */
-	public static final int VISION_INTERFACE_OVERRIDE_BUTTON = 2;
-	public static final double VISION_INTERFACE_VIDEO_WIDTH = 600; //800; //480; // FOV UPDATE
-	public static final double VISION_INTERFACE_VIDEO_FOV = 50;//68;
-	public static double VISION_INTERFACE_AIM_OFFSET = -7.5; // 0.85; // FOV UPDATE 
-	public static final double VISION_INTERFACE_TURN_GAIN = 0.02;//0.1;
-	public static final double VISION_INTERFACE_AIM_DEADZONE = 0.75; //1; //0.075;
-	public static final double VISION_INTERFACE_TURN_MAX_OUTPUT = 0.15;
-	public static final int VISION_INTERFACE_IMAGE_CAPTURE_SETTLE_TIMEOUT = 1750;
+	
 
 /**
  * Shooter stuff
  */
 	public static final int SHOOTER_FIRE_BUTTON = 1;
+	public static final int SHOOTER_OPERAOTOR_DRIVE_OVERRIDE_BUTTON = 2;
 	
 /**
  * Winch stuff
@@ -127,13 +121,13 @@ public class Map {
 	
 	public static final double WINCH_DIRECTION = 1.0;
 	
-	public static final int WINCH_DEPLOY_BUTTON = 2;
+	public static final int WINCH_DEPLOY_BUTTON = 7;
 	public static final double WINCH_BRAKE_TIMEOUT = 15.0;
 	
 /**
  * Logger stuff
  */
-	public static enum LOGGED_CLASSES { SEMAPHORE, DRIVE, GROUNDTRUTH, PNEUMATICS }
+	public static enum LOGGED_CLASSES { SEMAPHORE, DRIVE, GROUNDTRUTH, WINCH, SHOOTER }
 	
 	
 public static final String TEAM_BANNER = "ICAgICAgICAgICBfX18gICAgICAgICAgICAgIF9fICBfXw0KICAgICAgICAgICAgfCBfIF8gIF8gICAgL3wgfF8gIC8gIFwgfF9ffA0KICAgICAgICAgICAgfCgtKF98fHx8ICAgIHwgX18pIFxfXy8gICAgfA0KDQogICAgICAgICAgICAgICAgICAgICAgICAgXy4NCiAgICAgICAgICAgICAgICAgICAgICAgLicgb28NCiAgICAgICAgICAgICAgICAgICAgICAgfCAgICA+DQogICAgICAgICAgICAgICAgICAgICAgLyAvIDogYC4NCiAgICAgICAgICAgICAgICAgICAgIHxfLyAvICAgfA0KICAgICAgICAgICAgICAgICAgICAgICB8LyAgd3cNCl9fXyAgICAgICAgX18gICAgICAgICAgICAgICAgICAgICAgX18NCiB8IHxfICBfICB8ICBcIF8gXyBfICBfIF8gXyB8XyBfICB8X18pXyBfICBfICAgIC4gXyAgXw0KIHwgfCApKC0gIHxfXy8oLV8pfF8pKC18IChffHxfKC0gIHwgICgtfCApKF8pfF98fHwgKV8pDQogICAgICAgICAgICAgICAgICB8ICAgICAgICAgICAgICAgICAgICAgICBfLw==";

@@ -1,4 +1,4 @@
-package org.usfirst.frc.team1504.Utils;
+package org.usfirst.frc.team1504.vision;
 
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.vision.VisionPipeline;

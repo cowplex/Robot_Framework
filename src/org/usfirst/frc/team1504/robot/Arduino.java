@@ -30,6 +30,10 @@ public class Arduino
 	{
 		getInstance();
 	}
+	public static boolean initialized()
+	{
+		return instance != null;
+	}
 	
 
 /**

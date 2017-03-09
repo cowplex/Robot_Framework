@@ -1,5 +1,7 @@
 package org.usfirst.frc.team1504.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 //import java.io.BufferedReader;
 //import java.io.IOException;
 //import java.io.InputStreamReader;
@@ -38,8 +40,39 @@ public class Robot extends RobotBase {
     	//Pneumatics.initialize();
    // 	CameraInterface.initialize();
     	Winch.initialize();
-    	//Shooter.initialize();
+    	Shooter.initialize();
     	
+    	_arduino.setPartyMode(Arduino.PARTY_MODE.OFF);
+		_arduino.setMainLightsColor(0, 0, 0);
+		
+		// Spin off a thread to blink the team number in morse code
+		new Thread(new Runnable() {
+			public void run() {
+				Arduino arduino = Arduino.getInstance();
+				boolean fifteenohfour[] = {false, false, false, false, false, true, true, true, true, true, false, false, false, false, true}; // .----.....-----....-
+				int pos = 0;
+				while(pos < fifteenohfour.length)
+				{
+					if(fifteenohfour[pos])
+					{
+						arduino.setMainLightsColor(0, 255, 0);
+						Timer.delay(.3);
+					}
+			        else
+			        {
+			        	arduino.setMainLightsColor(0, 0, 255);
+			        	Timer.delay(.1);
+			        }
+					
+					arduino.setMainLightsColor(0, 0, 0);
+					Timer.delay(.05);
+					
+					pos++;
+				}
+				arduino.setMainLightsColor(0, 0, 0);
+			}
+		}).start();
+		
     	//System.out.println(new String(Base64.getDecoder().decode(Map.TEAM_BANNER)));
     }
 
@@ -59,7 +92,6 @@ public class Robot extends RobotBase {
 				
 				boolean warnings[] = {false, false};
 				
-				int pos[] = {0, 256, 256*2};
 				while(true)
 				{
 					SmartDashboard.putNumber("Robot Current", pdp.getTotalCurrent());
@@ -73,15 +105,11 @@ public class Robot extends RobotBase {
 					if(edge_track == 1) // Get image from groundtruth sensors, output it to the DS
 						SmartDashboard.putString("Groundtruth raw image", new String(_arduino.getSensorImage()));
 					
-					/*{
-						char t[] = new char[324 * 2];
-						for(int i = 0; i < t.length; i++)
-							t[i] = (char)(Math.random() * 255);
-						SmartDashboard.putString("Groundtruth raw image", new String(t));
-					}*/
 					_groundtruth.dashboard_update();
 					
-					if(m_ds.isOperatorControl())
+					
+					// Run warning lights
+					if(m_ds.isOperatorControl() && m_ds.isEnabled() && m_ds.getMatchTime() >= 0)
 					{
 						if(m_ds.getMatchTime() < Map.ROBOT_WARNING_TIME_LONG && !warnings[0])
 						{
@@ -92,25 +120,21 @@ public class Robot extends RobotBase {
 						else if(m_ds.getMatchTime() < Map.ROBOT_WARNING_TIME_SHORT && !warnings[1])
 						{
 							warnings[1] = true;
-							_arduino.setPulseSpeed(15);
+							_arduino.setPulseSpeed(20);
 							_arduino.setPartyMode(Arduino.PARTY_MODE.ON);
 							_arduino.setGearLights(Arduino.GEAR_MODE.PULSE);
 						}
 					}
 					else if(warnings[0] || warnings[1])// if(m_ds.isDisabled())
 					{
+						_arduino.setPartyMode(Arduino.PARTY_MODE.OFF);
+						_arduino.setMainLightsColor(0, 0, 0);
 						warnings[0] = warnings[1] = false;
+						
+						Drive.getInstance().setFrontAngle(0);
 					}
 					
 					Timer.delay(.05);
-					
-					for(int i = 0; i < pos.length; i++)
-						pos[i] = (pos[i] + 25) % (255*3);
-					//System.out.println(pos[0]);
-					char rgb[] = {0, 0, 0};
-					for(int i = 0; i < rgb.length; i++)
-						rgb[i] = (char) (pos[i] < 255 ? pos[i] : (pos[i] < 255*2 ? 255 : (255*3 - pos[i])));
-					_arduino.setMainLightsColor(rgb[0], rgb[1], rgb[2]);
 				}
 			}
 		});
@@ -131,6 +155,10 @@ public class Robot extends RobotBase {
      */
     protected void disabled() {
         System.out.println("Robot Disabled");
+        
+        _arduino.setPartyMode(Arduino.PARTY_MODE.ON);
+        _arduino.setGearLights(Arduino.GEAR_MODE.PULSE);
+        _arduino.setPulseSpeed(1);
     }
 
     /**
@@ -153,6 +181,14 @@ public class Robot extends RobotBase {
      */
     public void operatorControl() {
     	System.out.println("Operator Control");
+    	_arduino.setPartyMode(Arduino.PARTY_MODE.OFF);
+    	_arduino.setMainLightsColor(0, 0, 0);
+    	Timer.delay(.01);
+        _arduino.setGearLights(Arduino.GEAR_MODE.INDIVIDUAL_INTENSITY, 90, 90);
+        if(m_ds.getAlliance() == DriverStation.Alliance.Blue)
+        	_arduino.setMainLightsColor(0, 255, 0);
+        else
+        	_arduino.setMainLightsColor(0, 0, 255);
     }
 
     /**
@@ -162,16 +198,18 @@ public class Robot extends RobotBase {
     public void test()
     {
     	System.out.println("Test Mode!");
-    	CameraInterface ci = CameraInterface.getInstance();
-    	//ci.set_mode(CameraInterface.CAMERA_MODE.MULTI);
-    	//ci.set_mode(CameraInterface.CAMERA_MODE.SINGLE);
-    	while (isTest() && isEnabled())
-    	{
-    		// Switch camera views every 5 seconds like a pro
-    		ci.set_active_camera(ci.get_active_camera() == CameraInterface.CAMERAS.GEARSIDE ? CameraInterface.CAMERAS.INTAKESIDE : CameraInterface.CAMERAS.GEARSIDE);
-            System.out.println("Switching active camera to " + ci.get_active_camera().toString());
-            Timer.delay(5);
-    	}
+    	while(isTest() && isEnabled())
+    		System.out.println(IO.drive_input()[0]);
+//    	CameraInterface ci = CameraInterface.getInstance();
+//    	//ci.set_mode(CameraInterface.CAMERA_MODE.MULTI);
+//    	//ci.set_mode(CameraInterface.CAMERA_MODE.SINGLE);
+//    	while (isTest() && isEnabled())
+//    	{
+//    		// Switch camera views every 5 seconds like a pro
+//    		ci.set_active_camera(ci.get_active_camera() == CameraInterface.CAMERAS.GEARSIDE ? CameraInterface.CAMERAS.INTAKESIDE : CameraInterface.CAMERAS.GEARSIDE);
+//            System.out.println("Switching active camera to " + ci.get_active_camera().toString());
+//            Timer.delay(5);
+//    	}
     }
 
     /**

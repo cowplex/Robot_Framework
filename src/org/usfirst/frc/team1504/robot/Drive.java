@@ -1,8 +1,6 @@
 package org.usfirst.frc.team1504.robot;
 
 import java.nio.ByteBuffer;
-import java.util.TimerTask;
-import java.util.Timer;
 
 import org.usfirst.frc.team1504.robot.Update_Semaphore.Updatable;
 
@@ -37,11 +35,7 @@ public class Drive implements Updatable {
 	private Object _dump_lock;
 	private boolean _dump = false;
 	private volatile boolean _thread_alive = true;
-	
-	private char _direction = 0;
-	private TimerTask _osc = new TimerTask() { public void run() { _direction++; } };
-	private Timer _timer = new Timer();
-	
+		
     /**
      * Gets an instance of the Drive
      *
@@ -88,9 +82,7 @@ public class Drive implements Updatable {
 			}
 		});
 		_dump_thread.start();
-		
-		_timer.scheduleAtFixedRate(_osc, 0, 250);
-		
+				
 		System.out.println("Drive Initialized");
 	}
 	
@@ -111,7 +103,6 @@ public class Drive implements Updatable {
 	private volatile double[] _input = {0.0, 0.0, 0.0};
 	private volatile double _rotation_offset = 0.0;
 	private volatile double[] _orbit_point = {0.0, -1.15}; //{0.0, 1.15};
-	private DriveGlide _glide = new DriveGlide();
 	private Groundtruth _groundtruth = Groundtruth.getInstance();
 	
 	private CANTalon[] _motors = new CANTalon[Map.DRIVE_MOTOR_PORTS.length];
@@ -139,12 +130,7 @@ public class Drive implements Updatable {
 		// Get new values from the map
 		// Do all configurating first (orbit, front, etc.)
 		if(!_ds.isAutonomous())
-		{
-			if(IO.drive_wiggle() != 0.0)
-				drive_inputs(new double[] { 0.25 * (((_direction & 1) == 0) ? 1.0 : -1.0) , 0, 0.31 * IO.drive_wiggle()});
-			else
-				drive_inputs(IO.drive_input());
-		}
+			drive_inputs(IO.drive_input());
 		// so "_new_data = true" at the VERY END OF EVERYTHING
 	}
 	
@@ -172,11 +158,15 @@ public class Drive implements Updatable {
 	
 	public void setFrontAngle(double rotation_offset)
 	{
+		if(Double.isNaN(rotation_offset))
+			return;
 		_rotation_offset = rotation_offset;
 	}
 	
 	public void setFrontAngleDegrees(double rotation_offset)
 	{
+		if(Double.isNaN(rotation_offset))
+			return;
 		setFrontAngle(rotation_offset * Math.PI / 180.0);
 	}
 	
@@ -412,14 +402,15 @@ public class Drive implements Updatable {
 					// Don't do the fancy driver convenience stuff when we're PID controlling
 					if(_ds.isOperatorControl())
 					{
+						setFrontAngleDegrees(IO.drive_frontside_degrees());
 						// Detents
 						input = detents(input);
-						// Frontside
-						input = front_side(input);
 						// Orbit point
 						input = orbit_point(input);
 						// Glide
 						//input = _glide.gain_adjust(input);
+						// Frontside
+						input = front_side(input);
 						
 						_input = input;
 					}
