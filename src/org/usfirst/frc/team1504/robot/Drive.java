@@ -244,21 +244,26 @@ public class Drive implements Updatable {
 		if(!_groundtruth.getDataGood())
 			return input;
 		
-		double[] normal_input = input;
-		double[] output = input;
-		double[] speeds = _groundtruth.getSpeed();
+		
+		double[] normal_input = input.clone();// input;
+		double[] output = input.clone();
+		double[] speeds = _groundtruth.getSpeed().clone();
 		
 		// Normalize the inputs and actual speeds
-		if(groundtruth_normalize(speeds) == 0)
+		if(groundtruth_normalize(speeds) == 0 || groundtruth_normalize(normal_input) == 0)
 			return input;
-		groundtruth_normalize(normal_input);
+		//groundtruth_normalize(normal_input);
 		
 		// Apply P(ID) correction factor to the joystick values
 		// TODO: Determine gain constant and add to the Map
 		for(int i = 0; i < input.length; i++)
-			output[i] += (normal_input[i] - speeds[i]) * -0.01;
+			output[i] += (normal_input[i] - speeds[i]) * 0.15;
 		
-		return output;
+		System.out.println(normal_input[0] + " " + normal_input[1] + " " + normal_input[2] + " - " + speeds[0] + " " + speeds[1] + " " + speeds[2]);
+		System.out.println((normal_input[0] - speeds[0]) + " " + (normal_input[1] - speeds[1]) + " " + (normal_input[2] - speeds[2]));
+
+		//return output;
+		return input;
 	}
 	
 	/**
@@ -271,7 +276,7 @@ public class Drive implements Updatable {
 	{
 		double max = 0;
 		for(int i = 0; i < input.length; i++)
-			max = Math.max(Math.abs(input[1]), max);
+			max = Math.max(Math.abs(input[i]), max);
 		
 		if(max == 0)
 			return 0;
@@ -394,6 +399,8 @@ public class Drive implements Updatable {
 		while(_thread_alive)
 		{
 			input = _input;
+			//_groundtruth.getData(); // Always be getting groundtruth data
+			
 			if(_ds.isEnabled())
 			{
 				// Process new joystick data - only when new data happens
@@ -403,12 +410,13 @@ public class Drive implements Updatable {
 					if(_ds.isOperatorControl())
 					{
 						setFrontAngleDegrees(IO.drive_frontside_degrees());
+						
+						if(_rotation_offset == (Math.PI / 2.0))
+							input[1] *= 0.5;
 						// Detents
 						input = detents(input);
 						// Orbit point
 						input = orbit_point(input);
-						// Glide
-						//input = _glide.gain_adjust(input);
 						// Frontside
 						input = front_side(input);
 						
@@ -420,8 +428,9 @@ public class Drive implements Updatable {
 				}
 								
 				// Ground speed offset
-				_groundtruth.getData();
-				input = groundtruth_correction(input);
+//				_groundtruth.getData();
+//				if(SmartDashboard.getBoolean("Groundtruth Correction Enable", false))
+//					input = groundtruth_correction(input);
 				
 				// Output to motors - as fast as this loop will go
 				motorOutput(outputCompute(input));

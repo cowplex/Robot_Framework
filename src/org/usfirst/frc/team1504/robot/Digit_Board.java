@@ -10,11 +10,9 @@ public class Digit_Board
 	
 	private long _thread_sleep_delay = 100;
 	private int _thread_sleep_counter;
+	private int _thread_sleep_period = 10;
 	
-	private double _voltage;
-	
-	private double _current_pot;
-	private double _last_pot;
+	private String _current_display_text;
 
 	//Setting up a separate thread for the Digit Board
 	private static class Board_Task implements Runnable
@@ -74,46 +72,41 @@ public class Digit_Board
 		getInstance();
 	}
 	
-	//Updates the values used for the display.
-	public void update()
+	public void write(String value)
 	{
-		_current_pot = _board.getPotentiometer();
-		_voltage = _ds.getBatteryVoltage();
+		_current_display_text = value;
+		_thread_sleep_counter = 0;
 	}
 	
 	//Writes the values to the digit board.
-	public void write()
+	private void flush()
 	{
-		if (_current_pot != _last_pot)
+		if (_thread_sleep_counter < _thread_sleep_period)
 		{
-			_board.writeDigits("  " + Double.toString(_current_pot));
-			//_thread_sleep_delay = 100;
-			_thread_sleep_counter = 0;
+			_board.writeDigits(_current_display_text);
+			_thread_sleep_counter++;
 		}
 		else
 		{
-			if (_thread_sleep_counter < 7)
-			{
-				_board.writeDigits("  " + Double.toString(_current_pot));
-				_thread_sleep_counter++;
-			}
-			else
-			{
-				_board.writeDigits(Double.toString(_voltage).substring(0, 4) + "V");
-				//_thread_sleep_delay = 750;
-			}
+			_board.writeDigits(Double.toString(_ds.getBatteryVoltage()).substring(0, 4) + "V");
 		}
-		_last_pot = _current_pot;
 	}
 	
 	//The loop for the separate thread, where all functions are called.
 	private void board_task()
 	{	
-
+		double last_pot, current_pot;
+		last_pot = current_pot = 0;
 		while (_run)
-		{	
-			update();
-			write();
+		{
+			// Track potentiometer
+			current_pot = _board.getPotentiometer();
+			if (current_pot != last_pot)
+				write("  " + Double.toString(current_pot));
+			last_pot = current_pot;
+			
+			// Flush data buffers to digit board
+			flush();
 			try
 			{
 				Thread.sleep(_thread_sleep_delay); // wait a while because people can't read that fast

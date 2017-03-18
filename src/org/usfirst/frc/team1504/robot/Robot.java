@@ -23,6 +23,7 @@ public class Robot extends RobotBase {
 	
 	private Update_Semaphore _semaphore = Update_Semaphore.getInstance();
 	private Logger _logger = Logger.getInstance();
+	private Autonomous _autonomous = Autonomous.getInstance();
 	private Arduino _arduino = Arduino.getInstance();
 	private Groundtruth _groundtruth = Groundtruth.getInstance();
 	private Thread _dashboard_task;
@@ -41,9 +42,11 @@ public class Robot extends RobotBase {
    // 	CameraInterface.initialize();
     	Winch.initialize();
     	Shooter.initialize();
+    	Autonomus_Setup.initialize();
     	
     	_arduino.setPartyMode(Arduino.PARTY_MODE.OFF);
 		_arduino.setMainLightsColor(0, 0, 0);
+		_arduino.setFrontsideLights(Arduino.FRONTSIDE_MODE.REVERSE);
 		
 		// Spin off a thread to blink the team number in morse code
 		new Thread(new Runnable() {
@@ -130,8 +133,6 @@ public class Robot extends RobotBase {
 						_arduino.setPartyMode(Arduino.PARTY_MODE.OFF);
 						_arduino.setMainLightsColor(0, 0, 0);
 						warnings[0] = warnings[1] = false;
-						
-						Drive.getInstance().setFrontAngle(0);
 					}
 					
 					Timer.delay(.05);
@@ -244,10 +245,17 @@ public class Robot extends RobotBase {
                 // Zero groundtruth reading on start
                 _groundtruth.setPosition(new double[] {0.0, 0.0, 0.0});
                 
+                //if(Autonomus_Setup.initialized())
+                	_autonomous.setup_path(Autonomus_Setup.getInstance().get_path());
+                
+                _autonomous.start();
+                
                 while (isAutonomous() && !isDisabled()) {
                 	m_ds.waitForData(0.150);
                 	_semaphore.newData();
                 }
+                
+                _autonomous.stop();
                 
                 _logger.stop();
                 m_ds.InAutonomous(false);
@@ -267,6 +275,8 @@ public class Robot extends RobotBase {
             } else {
                 m_ds.InOperatorControl(true);
                 _logger.start("Tele");
+                
+                Drive.getInstance().setFrontAngle(0);
                 
                 operatorControl();
                 

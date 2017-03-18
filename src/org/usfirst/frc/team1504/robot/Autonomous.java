@@ -27,8 +27,11 @@ public class Autonomous
 	private Drive _drive = Drive.getInstance();
 	
 	private Timer _task_timer;
-	private volatile boolean _thread_alive = true;
+	private volatile boolean _thread_alive = false;
 	private long _start_time;
+	
+	private double[][] _path;
+	private int _path_step;
 	
 	protected Autonomous()
 	{
@@ -46,9 +49,18 @@ public class Autonomous
 		getInstance();
 	}
 	
+	public void setup_path(double[][] path)
+	{
+		_path = path;
+	}
 	
 	public void start()
 	{	
+		if(_path == null)
+			return;
+		
+		_path_step = -1;
+		
 		_thread_alive = true;
 		_start_time = System.currentTimeMillis();
 		
@@ -74,24 +86,58 @@ public class Autonomous
 	
 	protected void auto_task()
 	{
-		while(_thread_alive)
+//		while(_thread_alive)
 		{
 			// Don't drive around if we're not getting good sensor data
 			// Otherwise we drive super fast and out of control
 			/*if(!_groundtruth.getDataGood())
 				continue;*/
 			
+			// Calculate the program step we're on, quit if we're at the end of the list
+			int step = 0;
+			while(step < _path.length && _path[step][4] < (System.currentTimeMillis() - _start_time))
+				step++;
+			
+			// Alert user on new step
+			if(step > _path_step)
+			{
+				System.out.println("\tAutonomous step " + step + " @ " + (double)(System.currentTimeMillis() - _start_time)/1000);
+				_path_step = step;
+			}
+			
+			// Quit if there are no more steps left
+			if(step == _path.length)
+			{
+				stop();
+				return;
+			}
+			
 			// Get the target position and actual current position
 			
 			double[] output = new double[3];
 			
+			if(_path[step][3] == 0)
+			{
+				// Calculate P(ID) output for the drive thread 
+				for(int value = 0; value < 3; value++) // P loop
+					output[value] = _path[step][value];
+			}
+			else if(_path[step][3] == 1)
+			{
+
+			}
+			else if(_path[step][3] == 2)
+			{
+
+			}
+						
 			_drive.drive_inputs(output);
 			
-			try {
-				Thread.sleep(15);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+//			try {
+//				Thread.sleep(15);
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
 		}
 	}
 }

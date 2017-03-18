@@ -18,6 +18,7 @@ public class Shooter implements Updatable
 	private static DriverStation _driver_station = DriverStation.getInstance();
 	private static Preferences _preferences = Preferences.getInstance();
 	private static Logger _logger = Logger.getInstance();
+	private static Arduino _arduino = Arduino.getInstance();
 	
 	private CANTalon _shooter_motor = new CANTalon(30);
 	private CANTalon _hopper_motor = new CANTalon(31);
@@ -87,6 +88,8 @@ public class Shooter implements Updatable
 	 */
 	public void setEnabled(boolean enabled)
 	{
+		if(enabled != _enabled)
+			_arduino.setShooterLightStatus(enabled ? Arduino.SHOOTER_STATUS.AIMING : Arduino.SHOOTER_STATUS.OFF);
 		_enabled = enabled;
 	}
 	
@@ -178,7 +181,16 @@ public class Shooter implements Updatable
 		
 		if(_enabled)
 		{
+			// Joystick convenience - we'll see about this
+			if(IO.shooter_speed_correction() != 0.0)
+				setTargetSpeed(getTargetSpeed() + IO.shooter_speed_correction());
+			
 			_shooter_motor.set(-getTargetSpeed());
+			
+			if((_shot_speed_follower & 3) == 1)
+				_arduino.setShooterLightStatus(Arduino.SHOOTER_STATUS.AIM_LOCK);
+			else if((_shot_speed_follower & 3) == 2)
+				_arduino.setShooterLightStatus(Arduino.SHOOTER_STATUS.AIMING);
 			
 			if(_shot_number_follower > 50 || _clear_block)
 			{
@@ -229,6 +241,7 @@ public class Shooter implements Updatable
 			_shot_estimate++;
 			_shot_number_follower = 0;
 		}
+		
 //		else if(!_clear_block && _shot_number_follower > 18)
 //		{
 //			_shot_number_follower = (_shot_number_follower & 262143) >> 2;

@@ -83,10 +83,10 @@ public class Map {
 /**
  * Ground truth sensor
  */
-	public static final byte GROUNDTRUTH_QUALITY_MINIMUM = 40;
-	public static final double GROUNDTRUTH_DISTANCE_PER_COUNT = 1.0;
-	public static final double GROUNDTRUTH_TURN_CIRCUMFERENCE = 3.1416 * 1.25;
-	public static final int GROUNDTRUTH_SPEED_AVERAGING_SAMPLES = 4;
+	public static final byte GROUNDTRUTH_QUALITY_MINIMUM = 127;//10;//40;
+	public static final double GROUNDTRUTH_DISTANCE_PER_COUNT = 1.0 / 40.0 / 12.0;//1.0; // Feet per count
+	public static final double GROUNDTRUTH_TURN_CIRCUMFERENCE = 3.1416 * 2.0; // Radians
+	public static final int GROUNDTRUTH_SPEED_AVERAGING_SAMPLES = 1;//4;
 	
 	// Maximum (empirically determined) speed the robot can go in its three directions. 
 	public static final double[] GROUNDTRUTH_MAX_SPEEDS = {12.0, 5.0, 7.0};

@@ -279,7 +279,15 @@ public class DigitBoard
 		{	
 			update();
 			_display_board.writeBulk(_output_buffer);
-
+			
+			try
+			{
+				Thread.sleep(20);
+			}
+			catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 	

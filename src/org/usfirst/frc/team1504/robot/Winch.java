@@ -56,16 +56,16 @@ public class Winch implements Updatable
 												{
 													while(!_winch_deployed)
 													{
-														run_winch(-.2);
+														run_winch(-.25);
 														Timer.delay(.01);
 														run_winch(0.0);
-														for(int i = 0; i < 50 && !_winch_deployed; i++)
+														for(int i = 0; i < 10 && !_winch_deployed; i++)
 															Timer.delay(.01);//.5);
 													}
 													_winch_deployed = false;
 													
-													run_winch(1.0);
-													Timer.delay(1);
+													run_winch(0.4);
+													Timer.delay(1.75);
 													run_winch(0.0);
 													
 													_winch_deployed = true;
@@ -152,8 +152,8 @@ public class Winch implements Updatable
 	{
 		//magnitude = Math.abs(magnitude);
 		
-		_winch_motor_nancy.set(magnitude);
-		_winch_motor_mead.set(-1.0 * magnitude);
+		_winch_motor_nancy.set(-1.0 * magnitude);
+		_winch_motor_mead.set(magnitude);
 	}
 	
 	private void dump()

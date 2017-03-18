@@ -51,7 +51,7 @@ public class IO
 //		}
 		
 		if(_drive_forward.getRawButton(6) || _drive_forward.getRawButton(7)
-		   || _drive_rotation.getRawButton(10) || _drive_rotation.getRawButtonOnRisingEdge(11)
+		   || _drive_rotation.getRawButton(10) || _drive_rotation.getRawButton(11)
 		  )
 		{
 			double[] OP = {0.0, 0.0};
@@ -83,6 +83,14 @@ public class IO
 		return _operator_joystick.getRawButton(Map.SHOOTER_FIRE_BUTTON);
 	}
 	
+	public static double shooter_speed_correction()
+	{
+		return 
+				-1.0 * 
+				(Math.abs(_operator_joystick.getRawAxis(Map.WINCH_POWER_AXIS)) > .75 ? 1.0 : 0.0) * 
+				Math.signum(_operator_joystick.getRawAxis(Map.WINCH_POWER_AXIS));
+	}
+	
 /**
  * Winch stuff
  */
@@ -94,6 +102,8 @@ public class IO
 	
 	public static boolean deploy_winch()
 	{
+		if(operator_override())
+			return _operator_joystick.getRawButton(Map.WINCH_DEPLOY_BUTTON);
 		return _operator_joystick.getRawButtonOnRisingEdge(Map.WINCH_DEPLOY_BUTTON);
 	}
 }

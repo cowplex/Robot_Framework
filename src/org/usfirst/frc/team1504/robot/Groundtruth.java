@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Groundtruth implements Updatable {
 	private static final Groundtruth instance = new Groundtruth();
 	
-	private static final int DATA_MAP[] = {2, -1, 3, -4, 5, 6};
+	private static final int DATA_MAP[] = {2, -1, 3, -5, 4, 6};
 	
 	private Logger _logger = Logger.getInstance();
 	private Arduino _arduino = Arduino.getInstance();
@@ -109,7 +109,7 @@ public class Groundtruth implements Updatable {
 			_current_data[i] = (byte) (Math.signum(DATA_MAP[i]) * data[Math.abs(DATA_MAP[i]) - 1]);
 		
 		if(_driver_station.isEnabled())
-			compute(data);
+			compute(_current_data);
 		
 	}
 	
@@ -135,7 +135,7 @@ public class Groundtruth implements Updatable {
 		
 		// Normalize from raw counts to distance
 		for(int i = 0; i < data.length; i++)
-			normalized_data[i] = data[i] / Map.GROUNDTRUTH_DISTANCE_PER_COUNT;
+			normalized_data[i] = data[i] * Map.GROUNDTRUTH_DISTANCE_PER_COUNT;
 		
 		// Forward
 		motion[0] = (normalized_data[1] + normalized_data[4]) / 2.0;
@@ -153,7 +153,7 @@ public class Groundtruth implements Updatable {
 		
 		// Update global speed and acceleration values
 		long update_time = System.currentTimeMillis();
-		long elapsed_time = _last_update - update_time;
+		double elapsed_time = (update_time - _last_update) / 1000.0; // Convert to seconds
 		_last_update = update_time;
 		
 		// Put current speed value into averaging array
@@ -161,7 +161,7 @@ public class Groundtruth implements Updatable {
 			_speed_samples[_sample_index][i] = motion[i] / elapsed_time;
 		// Compute acceleration array
 		for(int i = 0; i < motion.length; i++)
-			_acceleration_samples[_sample_index][i] = (_speed_samples[_sample_index][i] - _speed_samples[(_sample_index + Map.GROUNDTRUTH_SPEED_AVERAGING_SAMPLES) % Map.GROUNDTRUTH_SPEED_AVERAGING_SAMPLES][i]) / elapsed_time;
+			_acceleration_samples[_sample_index][i] = (_speed_samples[_sample_index][i] - _speed_samples[(_sample_index + Map.GROUNDTRUTH_SPEED_AVERAGING_SAMPLES - 1) % Map.GROUNDTRUTH_SPEED_AVERAGING_SAMPLES][i]) / elapsed_time;
 		
 		// Find average speed
 		double[] speed = {0.0, 0.0, 0.0};
@@ -192,7 +192,6 @@ public class Groundtruth implements Updatable {
 
 	public void semaphore_update()
 	{
-		//return;
 		if(_raw_data.get(0) == 0)
 			return;
 		
@@ -200,6 +199,8 @@ public class Groundtruth implements Updatable {
 		for(int index = 0; index < _raw_data.size(); index++)
 			data[index] = _raw_data.get(index);
 		
+		data[0] = (byte) _raw_data.size();
+
 		_raw_data.clear();
 		_raw_data.add((byte) 0);
 		
@@ -214,16 +215,16 @@ public class Groundtruth implements Updatable {
 	public void dashboard_update()
 	{
 		// SmartDashboard output code
-		SmartDashboard.putNumber("Groundtruth position X", _position[0]);
-		SmartDashboard.putNumber("Groundtruth position Y", _position[1]);
+		SmartDashboard.putNumber("Groundtruth position Y", _position[0]);
+		SmartDashboard.putNumber("Groundtruth position X", _position[1]);
 		SmartDashboard.putNumber("Groundtruth position W", _position[2]);
 		
-		SmartDashboard.putNumber("Groundtruth speed X", _speed[0]);
-		SmartDashboard.putNumber("Groundtruth speed Y", _speed[1]);
+		SmartDashboard.putNumber("Groundtruth speed Y", _speed[0]);
+		SmartDashboard.putNumber("Groundtruth speed X", _speed[1]);
 		SmartDashboard.putNumber("Groundtruth speed W", _speed[2]);
 		
-		SmartDashboard.putNumber("Groundtruth acceleration X", _acceleration[0]);
-		SmartDashboard.putNumber("Groundtruth acceleration Y", _acceleration[1]);
+		SmartDashboard.putNumber("Groundtruth acceleration Y", _acceleration[0]);
+		SmartDashboard.putNumber("Groundtruth acceleration X", _acceleration[1]);
 		SmartDashboard.putNumber("Groundtruth acceleration W", _acceleration[2]);
 		
 		SmartDashboard.putBoolean("Groundtruth data good", _data_good);
