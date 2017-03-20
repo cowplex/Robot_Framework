@@ -106,7 +106,10 @@ public class Robot extends RobotBase {
 					// Get image from groundtruth sensor on rising edge of roboRIO User button
 					edge_track = (char)( ( (edge_track << 1) + (HALUtil.getFPGAButton() ? 1 : 0) ) & 3);
 					if(edge_track == 1) // Get image from groundtruth sensors, output it to the DS
+					{
 						SmartDashboard.putString("Groundtruth raw image", new String(_arduino.getSensorImage()));
+						_groundtruth.setPosition(new double[] {0.0, 0.0, 0.0});
+					}
 					
 					_groundtruth.dashboard_update();
 					
@@ -243,7 +246,7 @@ public class Robot extends RobotBase {
                 autonomous();
                 
                 // Zero groundtruth reading on start
-                _groundtruth.setPosition(new double[] {0.0, 0.0, 0.0});
+                //_groundtruth.setPosition(new double[] {0.0, 0.0, 0.0});
                 
                 //if(Autonomus_Setup.initialized())
                 	_autonomous.setup_path(Autonomus_Setup.getInstance().get_path());

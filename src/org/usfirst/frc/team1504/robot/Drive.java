@@ -399,7 +399,7 @@ public class Drive implements Updatable {
 		while(_thread_alive)
 		{
 			input = _input;
-			//_groundtruth.getData(); // Always be getting groundtruth data
+			_groundtruth.getData(); // Always be getting groundtruth data
 			
 			if(_ds.isEnabled())
 			{

@@ -23,7 +23,7 @@ public class Autonomous
 	
 	private static final Autonomous instance = new Autonomous();
 	
-	//private Groundtruth _groundtruth = Groundtruth.getInstance();
+	private Groundtruth _groundtruth = Groundtruth.getInstance();
 	private Drive _drive = Drive.getInstance();
 	
 	private Timer _task_timer;
@@ -124,7 +124,14 @@ public class Autonomous
 			}
 			else if(_path[step][3] == 1)
 			{
-
+				for(int value = 0; value < 3; value++) // P loop
+					output[value] = _path[step][value];
+				//output[0] = _groundtruth.getPosition()[0] * -.1;
+				//if(Math.abs(output[0]) > 0.3)
+				if(_groundtruth.getPosition()[0] < 0)
+					output[0] = 0.33;
+				else
+					output[0] = 0.0;
 			}
 			else if(_path[step][3] == 2)
 			{

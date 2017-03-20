@@ -10,7 +10,7 @@ public class Digit_Board
 	
 	private long _thread_sleep_delay = 100;
 	private int _thread_sleep_counter;
-	private int _thread_sleep_period = 10;
+	private static int _thread_sleep_period = 10;
 	
 	private String _current_display_text;
 

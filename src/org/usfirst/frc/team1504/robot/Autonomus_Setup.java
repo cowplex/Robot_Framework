@@ -10,6 +10,7 @@ public class Autonomus_Setup
 	private static DriverStation _driver_station = DriverStation.getInstance();
 	private static Digit_Board _digit_display = Digit_Board.getInstance();
 	private static DigitBoard _digit_hardware = DigitBoard.getInstance(); // TODO: fix this garbage
+	private static Groundtruth _groundtruth = Groundtruth.getInstance();
 	
 	private static enum STARTING_POSITIONS {CENTER, LEFT, RIGHT { @Override public STARTING_POSITIONS next() { return values()[0]; }; }; public STARTING_POSITIONS next() { return values()[ordinal() + 1]; }}
 	private static enum AUTO_TYPES {TIMED, GROUNDTRUTH  { @Override public AUTO_TYPES next() { return values()[0]; }; }; public AUTO_TYPES next() { return values()[ordinal() + 1]; }}
@@ -50,13 +51,18 @@ public class Autonomus_Setup
 					{
 						if(_digit_hardware.getAOnRisingEdge())
 						{
-							if(++active % 4 == 0)
+							if(++active % 5 == 0)
 								active = 1;
 							active_counter = 0;
 						}
 						
 						if(active > 0)
 						{
+							if(active == 4)
+							{
+								_digit_display.write(Double.toString(_groundtruth.getPosition()[0]));
+								continue;
+							}
 							if(_digit_hardware.getBOnRisingEdge())
 							{
 								if(active == 1)
@@ -104,13 +110,13 @@ public class Autonomus_Setup
 		{
 			case LEFT:
 				//Move forward, turn right, move forward
-				return new double[][] {{0.25, 0.0, 0.0, 0, 3800}, {0.0, 0.0, -0.25, 0, 5000}, {0.25, 0.0, 0.0, 0, 7200}};
+				return new double[][] {{0.25, 0.0, 0.0, (_auto_type == AUTO_TYPES.GROUNDTRUTH ? 1 : 0), 3800}, {0.0, 0.0, -0.25, 0, 5000}, {0.25, 0.0, 0.0, 0, 7200}};
 			case CENTER:
 				//Move forward
 				return new double[][] {{0.25, 0.0, 0.0, 0, 4000}};
 			case RIGHT:
 				//Move forward, turn left, move forward
-				return new double[][] {{0.25, 0.0, 0.0, 0, 3300}, {0.0, 0.0, 0.25, 0, 4500}, {0.25, 0.0, 0.0, 0, 7000}};
+				return new double[][] {{0.25, 0.0, 0.0, (_auto_type == AUTO_TYPES.GROUNDTRUTH ? 1 : 0), 3800}, {0.0, 0.0, 0.25, 0, 5000}, {0.25, 0.0, 0.0, 0, 7200}};
 		}
 		return new double[][] {{0.0, 0.0, 0.0, 0, 1}};
 	}

@@ -104,11 +104,16 @@ public class Groundtruth implements Updatable {
 	 */
 	public void getData()
 	{
+		if(DriverStation.getInstance().isOperatorControl())
+		{
+			_data_good = false;
+			return;
+		}
 		byte[] data = _arduino.getSensorData();
 		for(int i = 0; i < DATA_MAP.length; i++)
 			_current_data[i] = (byte) (Math.signum(DATA_MAP[i]) * data[Math.abs(DATA_MAP[i]) - 1]);
 		
-		if(_driver_station.isEnabled())
+		//if(_driver_station.isEnabled())
 			compute(_current_data);
 		
 	}
